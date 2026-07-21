@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HK Accessories Product Details - View images, specifications, price, variations, and order via Cash on Delivery or WhatsApp.">
+    <title>Product Details | HK Accessories</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+
+    <div class="announcement-bar">
+        <div class="container announcement-content">
+            <span><i class="fa-solid fa-truck-fast"></i> Cash on Delivery Across Pakistan (3-5 Days)</span>
+            <span><i class="fa-solid fa-gift"></i> Gift-Ready Packaging Available</span>
+            <span class="announcement-right">
+                <a href="https://wa.me/923001234567" target="_blank" class="whatsapp-link">
+                    <i class="fa-brands fa-whatsapp"></i> Order on WhatsApp: +92 300 1234567
+                </a>
+            </span>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <div class="container header-container">
+            <button class="mobile-menu-toggle" id="btn-mobile-menu-open" aria-label="Open Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div class="logo">
+                <a href="index.html">
+                    <span class="logo-hk">HK</span>
+                    <span class="logo-sub">ACCESSORIES</span>
+                </a>
+            </div>
+
+            <nav class="desktop-nav">
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="shop.html?dept=jewelry" class="nav-link">Jewelry</a></li>
+                    <li><a href="shop.html?dept=diecast" class="nav-link">Diecast</a></li>
+                    <li><a href="shop.html?dept=toys" class="nav-link">Toys</a></li>
+                    <li><a href="shop.html?dept=clothing" class="nav-link">Clothing</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <div class="search-container">
+                    <form id="search-form" class="search-form">
+                        <div class="search-input-wrapper">
+                            <input type="text" id="search-input" placeholder="Search products..." autocomplete="off">
+                            <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        </div>
+                    </form>
+                    <div class="search-suggestions" id="search-suggestions"></div>
+                </div>
+
+                <a href="tracking.html" class="action-icon tracking-btn-icon" title="Track Order">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                </a>
+
+                <button class="action-icon" id="btn-wishlist-toggle" title="Wishlist">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="badge" id="wishlist-count">0</span>
+                </button>
+
+                <button class="action-icon" id="btn-cart-toggle" title="Shopping Cart">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="badge" id="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="app">
+        <div class="page-loader">
+            <div class="spinner"></div>
+        </div>
+    </main>
+
+    <!-- Slide-out Shopping Cart Drawer -->
+    <div class="cart-drawer-overlay" id="cart-drawer-overlay"></div>
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-drawer-header">
+            <h3>Shopping Bag (<span id="drawer-cart-total-count">0</span>)</h3>
+            <button class="close-btn" id="btn-cart-close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-drawer-items" id="cart-drawer-items"></div>
+        <div class="cart-drawer-footer">
+            <div class="cart-drawer-summary">
+                <span class="summary-label">Subtotal:</span>
+                <span class="summary-value" id="cart-drawer-subtotal">PKR 0</span>
+            </div>
+            <div class="cart-drawer-actions">
+                <a href="cart.html" class="btn btn-outline-dark btn-full">View Bag</a>
+                <a href="checkout.html" class="btn btn-gold btn-full">Proceed to Checkout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div class="mobile-drawer-overlay" id="mobile-drawer-overlay"></div>
+    <div class="mobile-drawer" id="mobile-drawer">
+        <div class="mobile-drawer-header">
+            <h3>HK Accessories</h3>
+            <button class="close-btn" id="btn-mobile-menu-close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="mobile-drawer-body">
+            <ul class="mobile-nav-links">
+                <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+                <li><a href="shop.html?dept=jewelry" class="mobile-nav-link">Jewelry</a></li>
+                <li><a href="shop.html?dept=diecast" class="mobile-nav-link">Diecast</a></li>
+                <li><a href="shop.html?dept=toys" class="mobile-nav-link">Toys</a></li>
+                <li><a href="shop.html?dept=clothing" class="mobile-nav-link">Clothing</a></li>
+                <li><a href="about.html" class="mobile-nav-link">About Us</a></li>
+                <li><a href="contact.html" class="mobile-nav-link">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col brand-col">
+                <a href="index.html" class="footer-logo">HK <span class="logo-sub">ACCESSORIES</span></a>
+                <p class="footer-tagline">Premium accessible fashion jewelry & collectibles across Pakistan.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Departments</h4>
+                <ul>
+                    <li><a href="shop.html?dept=jewelry">Jewelry Collection</a></li>
+                    <li><a href="shop.html?dept=diecast">Diecast Metal Models</a></li>
+                    <li><a href="shop.html?dept=toys">Premium Toys & Games</a></li>
+                    <li><a href="shop.html?dept=clothing">Clothing Apparel</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Customer Service</h4>
+                <ul>
+                    <li><a href="about.html">About HK Accessories</a></li>
+                    <li><a href="contact.html">Contact Support</a></li>
+                    <li><a href="tracking.html">Track Your Order</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container footer-bottom-flex">
+                <p>&copy; 2026 HK Accessories. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
