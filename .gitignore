@@ -85,3 +85,9 @@ logs/
 *.temp
 *~
 data/products-mock-backup.json
+
+# ─── Scratch Test Scripts ─────────────────────────────────────────────────────
+test_*.py
+audit_*.py
+analyze_*.py
+

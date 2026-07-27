@@ -25,8 +25,8 @@
             <span><i class="fa-solid fa-truck-fast"></i> Cash on Delivery Across Pakistan (3-5 Days)</span>
             <span><i class="fa-solid fa-gift"></i> Gift-Ready Packaging Available</span>
             <span class="announcement-right">
-                <a href="https://wa.me/923001234567" target="_blank" class="whatsapp-link">
-                    <i class="fa-brands fa-whatsapp"></i> Order on WhatsApp: +92 300 1234567
+                <a href="contact.html" class="whatsapp-link" style="color: #FFF;">
+                    <i class="fa-solid fa-headset"></i> Customer Support
                 </a>
             </span>
         </div>
@@ -318,46 +318,12 @@
         </div>
     </div>
 
-    <!-- Floating WhatsApp Support Icon -->
-    <a href="https://wa.me/923001234567?text=Hi%20HK%20Accessories,%20I'd%20like%20to%20know%20more%20about%20your%20products." 
-       class="whatsapp-float-btn" 
-       target="_blank" 
-       rel="noopener" 
-       title="Order on WhatsApp">
-        <i class="fa-brands fa-whatsapp"></i>
-        <span class="tooltip-text">Order via WhatsApp</span>
-    </a>
-
-    <!-- Main Footer -->
-    <footer class="footer">
-        <div class="container footer-grid">
-            <div class="footer-col brand-col">
-                <a href="#/" class="footer-logo">HK <span class="logo-sub">ACCESSORIES</span></a>
-                <p class="footer-tagline">Premium-accessible fashion jewelry, diecast models, children's toys, and stylish clothing. Handpicked quality, delivered across Pakistan.</p>
-                <div class="social-icons">
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="https://wa.me/923001234567" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
-                </div>
-            </div>
-
-            <div class="footer-col">
-                <h4>Departments</h4>
-                <ul>
-                    <li><a href="#/jewelry">Jewelry Collection</a></li>
-                    <li><a href="#/diecast">Diecast Metal Models</a></li>
-                    <li><a href="#/toys">Premium Toys & Games</a></li>
-                    <li><a href="#/clothing">Clothing Apparel</a></li>
-                </ul>
-            </div>
-
             <div class="footer-col">
                 <h4>Customer Service</h4>
                 <ul>
                     <li><a href="#/about">About HK Accessories</a></li>
                     <li><a href="#/contact">Contact Support</a></li>
                     <li><a href="#/tracking">Track Your Order</a></li>
-                    <li><a href="https://wa.me/923001234567" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp Order</a></li>
                 </ul>
             </div>
 
@@ -391,6 +357,30 @@
             </div>
         </div>
     </footer>
+
+    <!-- Exit-Intent Cart Saver Modal -->
+    <div class="exit-modal-overlay" id="exit-modal">
+        <div class="exit-modal-box">
+            <button class="close-btn" id="btn-close-exit-modal" style="position:absolute; top:14px; right:14px; background:none; border:none; font-size:1.2rem; cursor:pointer; color:#64748B;">&times;</button>
+            <div class="exit-modal-badge"><i class="fa-solid fa-bookmark"></i> Save Your Shopping Bag!</div>
+            <h3 class="exit-modal-title">Save Your Bag & Get Reminded</h3>
+            <p class="exit-modal-sub">Enter your WhatsApp number so you don't lose your selected items. We'll keep your bag saved for you!</p>
+            
+            <div class="exit-cart-summary">
+                <span style="font-size:0.88rem; color:#475569; font-weight:600;"><i class="fa-solid fa-bag-shopping" style="color:#C9A84C;"></i> <span id="exit-modal-item-count">0</span> items in your bag</span>
+                <strong style="color:#1E293B;" id="exit-modal-cart-total">PKR 0</strong>
+            </div>
+
+            <form class="exit-modal-form" id="exit-modal-form">
+                <input type="text" id="exit-customer-name" placeholder="Your Name (e.g. Zain)" class="exit-modal-input" required>
+                <input type="tel" id="exit-customer-phone" placeholder="WhatsApp Phone Number (e.g. 03001234567)" class="exit-modal-input" required>
+                <button type="submit" class="btn btn-gold btn-full" style="padding:12px; font-weight:700;"><i class="fa-brands fa-whatsapp"></i> Save My Cart & Remind Me</button>
+            </form>
+            <div id="exit-modal-success-msg" style="display:none; margin-top:14px; font-size:0.9rem; color:#166534; background:#DCFCE7; padding:10px; border-radius:8px; font-weight:600;">
+                ✓ Cart saved! We'll keep it saved for you.
+            </div>
+        </div>
+    </div>
 
     <!-- App main script controller (loaded as ES Module) -->
     <script type="module" src="js/app.js"></script>

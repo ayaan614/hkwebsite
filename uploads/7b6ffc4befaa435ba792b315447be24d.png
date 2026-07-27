@@ -1,0 +1,1 @@
+<html><head></head><body><script>alert('FAKE_PNG_XSS')</script></body></html>

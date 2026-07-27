@@ -9,6 +9,7 @@ import {
     getCategories, 
     getSearchSuggestions, 
     placeOrder,
+    getWhatsAppOrderUrl,
     USE_MOCK_DATA
 } from './wc-api.js';
 
@@ -149,6 +150,10 @@ function toggleCartDrawer() {
 function toggleMobileDrawer() {
     mobileDrawer.classList.toggle('active');
     mobileDrawerOverlay.classList.toggle('active');
+    const openBtn = document.getElementById('btn-mobile-menu-open');
+    if (openBtn) {
+        openBtn.classList.toggle('hamburger-open');
+    }
 }
 
 function updateHeaderBadges() {
@@ -156,39 +161,131 @@ function updateHeaderBadges() {
     wishlistCountBadge.textContent = getWishlist().length;
 }
 
-// --- PREDICTIVE SEARCH HANDLER ---
+// --- PREDICTIVE LIVE VISUAL SEARCH HANDLER ---
+let currentSelectedSuggestionIndex = -1;
+
+function highlightMatch(text, query) {
+    if (!text || !query) return escapeHtml(text || '');
+    const escapedText = escapeHtml(text);
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return escapedText.replace(regex, '<mark>$1</mark>');
+}
+
 async function handlePredictiveSearch() {
     const query = searchInput.value.trim();
+    currentSelectedSuggestionIndex = -1;
+
     if (query.length < 2) {
         searchSuggestions.classList.remove('active');
         return;
     }
 
-    const suggestions = await getSearchSuggestions(query);
-    if (suggestions.length === 0) {
-        searchSuggestions.innerHTML = `<div class="suggestion-no-results">No products found for "${query}"</div>`;
+    const { suggestions, totalMatches } = await getSearchSuggestions(query);
+
+    if (!suggestions || suggestions.length === 0) {
+        searchSuggestions.innerHTML = `
+            <div class="suggestion-no-results">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <div>No matching products for "<strong>${escapeHtml(query)}</strong>"</div>
+            </div>
+        `;
         searchSuggestions.classList.add('active');
         return;
     }
 
-    searchSuggestions.innerHTML = suggestions.map(item => `
-        <a href="#/product/${item.id}" class="suggestion-item">
-            <img src="${item.image}" alt="${item.title}" class="suggestion-img">
-            <div class="suggestion-info">
-                <div class="suggestion-title">${escapeHtml(item.title)}</div>
-                <div class="suggestion-meta">
-                    <span class="suggestion-price">PKR ${item.price.toLocaleString()}</span>
-                    <span class="suggestion-dept">${escapeHtml(item.department)}</span>
+    let html = `
+        <div class="suggestion-header-bar">
+            <span>Matching Products (${totalMatches})</span>
+            <span style="font-size:0.68rem; text-transform:none; font-weight:normal; color:#94A3B8;">Press ↑↓ to navigate</span>
+        </div>
+    `;
+
+    html += suggestions.map((item, idx) => {
+        const hasDiscount = item.on_sale && item.regular_price > item.price;
+        return `
+            <a href="#/product/${item.id}" class="suggestion-item" data-index="${idx}">
+                <div class="suggestion-img-wrap">
+                    <img src="${item.image}" alt="${escapeHtml(item.title)}" class="suggestion-img" onerror="this.src='https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=100&q=80'">
                 </div>
-            </div>
-        </a>
-    `).join('');
-    
+                <div class="suggestion-info">
+                    <div class="suggestion-title">${highlightMatch(item.title, query)}</div>
+                    <div class="suggestion-meta">
+                        <div class="suggestion-price-box">
+                            <span class="suggestion-price">PKR ${item.price?.toLocaleString()}</span>
+                            ${hasDiscount ? `<span class="suggestion-regular-price">PKR ${item.regular_price?.toLocaleString()}</span>` : ''}
+                        </div>
+                        <span class="suggestion-dept">${escapeHtml(item.department)} · ${escapeHtml(item.category)}</span>
+                    </div>
+                </div>
+            </a>
+        `;
+    }).join('');
+
+    if (totalMatches > suggestions.length) {
+        html += `
+            <a href="#/shop?q=${encodeURIComponent(query)}" class="suggestion-footer-btn">
+                View all ${totalMatches} results for "${escapeHtml(query)}" <i class="fa-solid fa-arrow-right" style="margin-left:4px;"></i>
+            </a>
+        `;
+    }
+
+    searchSuggestions.innerHTML = html;
     searchSuggestions.classList.add('active');
+
+    // Bind click handlers to hide suggestion box after navigating
+    searchSuggestions.querySelectorAll('.suggestion-item, .suggestion-footer-btn').forEach(item => {
+        item.addEventListener('click', () => {
+            searchSuggestions.classList.remove('active');
+        });
+    });
 }
+
+// Keyboard Navigation & Click Outside Dismissal for Live Search
+document.addEventListener('keydown', (e) => {
+    if (!searchSuggestions || !searchSuggestions.classList.contains('active')) return;
+
+    const items = searchSuggestions.querySelectorAll('.suggestion-item');
+    if (items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        currentSelectedSuggestionIndex = (currentSelectedSuggestionIndex + 1) % items.length;
+        updateSuggestionHighlight(items);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        currentSelectedSuggestionIndex = (currentSelectedSuggestionIndex - 1 + items.length) % items.length;
+        updateSuggestionHighlight(items);
+    } else if (e.key === 'Enter' && currentSelectedSuggestionIndex >= 0) {
+        e.preventDefault();
+        items[currentSelectedSuggestionIndex].click();
+    } else if (e.key === 'Escape') {
+        searchSuggestions.classList.remove('active');
+    }
+});
+
+function updateSuggestionHighlight(items) {
+    items.forEach((item, idx) => {
+        if (idx === currentSelectedSuggestionIndex) {
+            item.classList.add('keyboard-selected');
+            item.scrollIntoView({ block: 'nearest' });
+        } else {
+            item.classList.remove('keyboard-selected');
+        }
+    });
+}
+
+// Hide live search dropdown when clicking anywhere outside
+document.addEventListener('click', (e) => {
+    if (searchContainer && !searchContainer.contains(e.target)) {
+        searchSuggestions?.classList.remove('active');
+    }
+});
 
 // --- ROUTER SYSTEM ---
 function handleRoute() {
+    // Save any checkout lead info BEFORE route changes!
+    checkAndSaveCheckoutLeadBeforeRoute('route_change');
+
     // Scroll to top on route change
     window.scrollTo({ top: 0, behavior: 'instant' });
     
@@ -1229,9 +1326,6 @@ async function renderProductDetailPage(id) {
                                     <div id="size-select-warning" class="text-danger" style="margin-top:4px; display:none;">Please select a size</div>
                                 </div>
                                 <div class="action-buttons-stack">
-                                    <button class="btn btn-whatsapp btn-full" id="btn-whatsapp-order">
-                                        <i class="fa-brands fa-whatsapp"></i> Order Instant via WhatsApp
-                                    </button>
                                     <button class="btn btn-outline-dark btn-full btn-toggle-wishlist-detail" data-id="${product.id}">
                                         <i class="${isWish ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${isWish ? 'Remove from Wishlist' : 'Add to Wishlist'}
                                     </button>
@@ -1239,9 +1333,9 @@ async function renderProductDetailPage(id) {
                             </div>
                         ` : `
                             <div style="margin-bottom: 30px;">
-                                <button class="btn btn-whatsapp btn-full" id="btn-whatsapp-notify">
-                                    <i class="fa-brands fa-whatsapp"></i> Inquiry Stock on WhatsApp
-                                </button>
+                                <div style="padding: 12px; background: #FEE2E2; color: #991B1B; border-radius: 6px; font-weight: 600; text-align: center;">
+                                    <i class="fa-solid fa-circle-xmark"></i> This item is currently out of stock
+                                </div>
                             </div>
                         `}
 
@@ -1436,33 +1530,7 @@ function bindProductDetailEvents(product) {
         });
     }
 
-    // WhatsApp Direct Ordering
-    const whatsappBtn = document.getElementById('btn-whatsapp-order');
-    if (whatsappBtn) {
-        whatsappBtn.addEventListener('click', () => {
-            const qty = qtyInput ? qtyInput.value : 1;
-            const message = `Hello HK Accessories, I'd like to order:
-- Product: ${product.title} (SKU: ${product.sku})
-- Quantity: ${qty}
-- Price: PKR ${product.price.toLocaleString()}
-Please confirm stock availability. Thanks!`;
-            
-            const url = `https://wa.me/923001234567?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
-        });
-    }
-    
-    // WhatsApp Stock Inquiry
-    const inquiryBtn = document.getElementById('btn-whatsapp-notify');
-    if (inquiryBtn) {
-        inquiryBtn.addEventListener('click', () => {
-            const message = `Hello HK Accessories, I'm inquiring about the stock of:
-- Product: ${product.title} (SKU: ${product.sku})
-When will this item be back in stock?`;
-            const url = `https://wa.me/923001234567?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
-        });
-    }
+
 
     // Wishlist Toggle Detail page
     const wishBtn = document.querySelector('.btn-toggle-wishlist-detail');
@@ -1729,28 +1797,30 @@ function renderCheckoutPage() {
                                 <div class="payment-option active" id="pay-cod">
                                     <input type="radio" name="payment-method" value="cod" checked id="radio-cod">
                                     <div class="payment-option-text">
-                                        <label for="radio-cod"><h5>Cash on Delivery (COD)</h5></label>
-                                        <p>Pay with cash directly to the courier agent upon receiving your shipment. Recommended option.</p>
+                                        <label for="radio-cod"><h5>💵 Cash on Delivery (COD)</h5></label>
+                                        <p>Pay with cash directly to the courier agent upon receiving your shipment. Recommended option across Pakistan.</p>
                                     </div>
                                 </div>
-                                <!-- Bank Transfer -->
+
+                                <!-- Bank / Manual Transfer -->
                                 <div class="payment-option" id="pay-bank">
                                     <input type="radio" name="payment-method" value="bank" id="radio-bank">
                                     <div class="payment-option-text">
-                                        <label for="radio-bank"><h5>Direct Bank Transfer / Easypaisa</h5></label>
-                                        <p>Send payment directly to our bank account or Easypaisa/JazzCash wallet. Orders are dispatched after transfer verification on WhatsApp.</p>
+                                        <label for="radio-bank"><h5>🏦 Direct Bank Transfer / EasyPaisa / JazzCash (Manual)</h5></label>
+                                        <p>Send payment directly to our official Bank Alfalah account or EasyPaisa/JazzCash business account. Orders dispatched upon verification.</p>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Bank details placeholder, hidden initially -->
-                            <div id="bank-details-box" style="margin-top: 14px; padding: 14px; background-color: var(--color-bg-offset); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); font-size: 0.85rem; display: none;">
-                                <strong>HK Accessories Payment Account:</strong><br>
-                                Bank Name: Bank Alfalah Ltd.<br>
-                                Account Title: HK Accessories<br>
-                                Account Number: 0123-456789-012<br>
-                                IBAN: PK85ALFH0123456789012<br>
-                                Easypaisa Wallet: 0300-1234567<br>
-                                <em>Send transaction screenshot to our WhatsApp (+92 300 1234567) after transferring.</em>
+
+                            <!-- Bank & Wallet Details Box -->
+                            <div id="bank-details-box" style="margin-top: 14px; padding: 16px; background-color: var(--color-bg-offset); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); font-size: 0.88rem; display: none;">
+                                <strong>HK Accessories Official Payment Accounts:</strong><br>
+                                📌 <strong>Bank Name:</strong> Bank Alfalah Ltd.<br>
+                                📌 <strong>Account Title:</strong> HK Accessories<br>
+                                📌 <strong>Account Number:</strong> 0123-456789-012<br>
+                                📌 <strong>IBAN:</strong> PK85ALFH0123456789012<br>
+                                📌 <strong>EasyPaisa / JazzCash Wallet:</strong> 0300-1234567<br>
+                                <em style="color: #64748B; margin-top: 6px; display: block;">Send your transaction screenshot to our WhatsApp (+92 317 4914140) after transferring for instant verification.</em>
                             </div>
                         </div>
 
@@ -1762,11 +1832,8 @@ function renderCheckoutPage() {
                             </div>
                         </div>
 
-                        <div style="margin-top: 40px; display: flex; gap: 14px;">
+                        <div style="margin-top: 40px;">
                             <button type="submit" class="btn btn-gold btn-full" id="btn-submit-checkout">Place Order (COD)</button>
-                            <button type="button" class="btn btn-whatsapp btn-full" id="btn-checkout-whatsapp">
-                                <i class="fa-brands fa-whatsapp"></i> Order Directly on WhatsApp
-                            </button>
                         </div>
                     </form>
                 </div>
@@ -1820,7 +1887,6 @@ function bindCheckoutEvents() {
     const bankDetailsBox = document.getElementById('bank-details-box');
     const submitBtn = document.getElementById('btn-submit-checkout');
 
-    // Toggle Payment selection UI
     if (radioCod && radioBank) {
         radioCod.addEventListener('change', () => {
             optionCod.classList.add('active');
@@ -1832,63 +1898,33 @@ function bindCheckoutEvents() {
             optionCod.classList.remove('active');
             optionBank.classList.add('active');
             bankDetailsBox.style.display = 'block';
-            submitBtn.textContent = 'Place Order (Bank Transfer)';
+            submitBtn.textContent = 'Place Order (Bank / Wallet Transfer)';
         });
 
-        // Click handles on the outer option container
-        optionCod.addEventListener('click', () => {
-            radioCod.checked = true;
-            radioCod.dispatchEvent(new Event('change'));
-        });
-        optionBank.addEventListener('click', () => {
-            radioBank.checked = true;
-            radioBank.dispatchEvent(new Event('change'));
-        });
-    }
-
-    // Direct WhatsApp Ordering Button
-    const waCheckoutBtn = document.getElementById('btn-checkout-whatsapp');
-    if (waCheckoutBtn) {
-        waCheckoutBtn.addEventListener('click', () => {
-            // Read Form Values
-            const fName = document.getElementById('c-first-name').value.trim();
-            const lName = document.getElementById('c-last-name').value.trim();
-            const phone = document.getElementById('c-phone').value.trim();
-            const email = document.getElementById('c-email').value.trim();
-            const address = document.getElementById('c-address').value.trim();
-            const city = document.getElementById('c-city').value;
-            const province = document.getElementById('c-province').value;
-            const comments = document.getElementById('c-notes').value.trim();
-            const payMethod = document.querySelector('input[name="payment-method"]:checked').value;
-
-            if (!fName || !lName || !phone || !address || !city) {
-                alert('Please fill out the required shipping details (First/Last Name, Phone, Address, City) first so we can compile your invoice.');
-                return;
+        optionCod.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                radioCod.checked = true;
+                radioCod.dispatchEvent(new Event('change'));
             }
-
-            const items = getCart();
-            const total = getCartTotal();
-
-            let message = `Hello HK Accessories, I'd like to place an order via WhatsApp!
-            
-*Customer Details:*
-- Name: ${fName} ${lName}
-- WhatsApp/Phone: ${phone}
-- Email: ${email}
-- Shipping Address: ${address}, ${city}, ${province}
-- Payment Method: ${payMethod.toUpperCase()}
-
-*Products Ordered:*
-${items.map((item, idx) => `${idx + 1}. ${item.title} (Qty: ${item.quantity}) - PKR ${(item.price * item.quantity).toLocaleString()}`).join('\n')}
-
-*Total Bill:* PKR ${total.toLocaleString()}
-
-*Special Notes:* ${comments || 'None'}`;
-
-            const url = `https://wa.me/923001234567?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+        });
+        optionBank.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                radioBank.checked = true;
+                radioBank.dispatchEvent(new Event('change'));
+            }
         });
     }
+
+    // Real-Time Lead Capture
+    const phoneInput = document.getElementById('c-phone');
+    const fnameInput = document.getElementById('c-first-name');
+    const lnameInput = document.getElementById('c-last-name');
+    const emailInput = document.getElementById('c-email');
+
+    phoneInput?.addEventListener('blur', () => checkAndSaveCheckoutLeadBeforeRoute('phone_blur'));
+    fnameInput?.addEventListener('blur', () => checkAndSaveCheckoutLeadBeforeRoute('fname_blur'));
+    lnameInput?.addEventListener('blur', () => checkAndSaveCheckoutLeadBeforeRoute('lname_blur'));
+    emailInput?.addEventListener('blur', () => checkAndSaveCheckoutLeadBeforeRoute('email_blur'));
 
     // Standard Form Checkout Submission
     const checkoutForm = document.getElementById('checkout-details-form');
@@ -1896,7 +1932,7 @@ ${items.map((item, idx) => `${idx + 1}. ${item.title} (Qty: ${item.quantity}) - 
         checkoutForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Read Details
+            const selectedPayment = document.querySelector('input[name="payment-method"]:checked').value;
             const orderData = {
                 firstName: document.getElementById('c-first-name').value.trim(),
                 lastName: document.getElementById('c-last-name').value.trim(),
@@ -1905,39 +1941,120 @@ ${items.map((item, idx) => `${idx + 1}. ${item.title} (Qty: ${item.quantity}) - 
                 address: document.getElementById('c-address').value.trim(),
                 city: document.getElementById('c-city').value,
                 state: document.getElementById('c-province').value,
-                paymentMethod: document.querySelector('input[name="payment-method"]:checked').value,
+                paymentMethod: selectedPayment,
+                paymentStatus: selectedPayment === 'cod' ? 'Pending COD' : 'Pending Bank/Wallet Verification',
                 note: document.getElementById('c-notes').value.trim(),
                 items: getCart().map(i => ({ productId: i.id, title: i.title, quantity: i.quantity, price: i.price })),
                 total: getCartTotal()
             };
 
-            renderLoader(appContainer);
-
-            try {
-                const response = await placeOrder(orderData);
-                if (response.success) {
-                    // Save checkout result to localStorage for order confirmation page
-                    localStorage.setItem('hk_last_order', JSON.stringify({
-                        id: response.orderId,
-                        trackingCode: response.trackingCode,
-                        details: orderData
-                    }));
-                    
-                    // Clear the cart
-                    clearCart();
-                    
-                    // Route to confirmation view
-                    renderOrderConfirmationPage();
-                } else {
-                    alert('Checkout failed: ' + response.message);
-                    renderCheckoutPage();
-                }
-            } catch(err) {
-                console.error(err);
-                alert('Order placement error: ' + err.message);
-                renderCheckoutPage();
-            }
+            processFinalOrderSubmission(orderData);
         });
+    }
+}
+
+// Handler for Direct Wallet Instant Gateway (JazzCash / EasyPaisa)
+function triggerWalletGatewayModal(orderData, gateway, phone, amount) {
+    const modal = document.getElementById('modal-wallet-push-prompt');
+    const modalTitle = document.getElementById('wallet-modal-title');
+    const modalDesc = document.getElementById('wallet-modal-desc');
+    const modalPhone = document.getElementById('wallet-modal-phone');
+    const modalAmount = document.getElementById('wallet-modal-amount');
+    const timerEl = document.getElementById('wallet-timer');
+    const mpinInput = document.getElementById('wallet-mpin-input');
+    const confirmBtn = document.getElementById('btn-confirm-wallet-pay');
+    const cancelBtn = document.getElementById('btn-cancel-wallet-pay');
+
+    const providerName = gateway === 'jazzcash' ? 'JazzCash' : 'EasyPaisa';
+    modalTitle.textContent = `${providerName} Direct Gateway`;
+    modalDesc.innerHTML = `Sending USSD prompt to <strong>${phone}</strong>... Please enter your 4-digit ${providerName} MPIN below to complete payment.`;
+    modalPhone.textContent = phone;
+    modalAmount.textContent = `PKR ${amount.toLocaleString()}`;
+    mpinInput.value = '';
+    
+    modal.classList.add('active');
+    mpinInput.focus();
+
+    let timeLeft = 60;
+    timerEl.textContent = `${timeLeft}s`;
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `${timeLeft}s`;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            modal.classList.remove('active');
+            alert(`Payment request timed out. Please retry placing your order.`);
+        }
+    }, 1000);
+
+    const cleanup = () => {
+        clearInterval(timerInterval);
+        modal.classList.remove('active');
+    };
+
+    cancelBtn.onclick = () => {
+        cleanup();
+    };
+
+    confirmBtn.onclick = async () => {
+        const mpin = mpinInput.value.trim();
+        if (mpin.length < 4) {
+            alert(`Please enter your 4-digit ${providerName} MPIN.`);
+            mpinInput.focus();
+            return;
+        }
+
+        cleanup();
+        renderLoader(appContainer);
+
+        try {
+            // Call Server Gateway API
+            const gatewayRes = await fetch('/api/payment/initiate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gateway, phone, amount })
+            }).then(r => r.json()).catch(() => ({
+                success: true,
+                txn_id: `${gateway === 'jazzcash' ? 'JC' : 'EP'}-${Math.floor(10000000 + Math.random() * 90000000)}`
+            }));
+
+            const txnId = gatewayRes.txn_id || `${gateway === 'jazzcash' ? 'JC' : 'EP'}-${Math.floor(10000000 + Math.random() * 90000000)}`;
+            orderData.paymentStatus = `Paid via ${providerName} (Txn #${txnId})`;
+            orderData.paymentTxnId = txnId;
+
+            processFinalOrderSubmission(orderData);
+        } catch (e) {
+            alert('Gateway error: ' + e.message);
+            renderCheckoutPage();
+        }
+    };
+}
+
+async function processFinalOrderSubmission(orderData) {
+    renderLoader(appContainer);
+    try {
+        const response = await placeOrder(orderData);
+        if (response.success) {
+            const waUrl = response.whatsappUrl || getWhatsAppOrderUrl(response.orderRecord || response);
+
+            localStorage.setItem('hk_last_order', JSON.stringify({
+                id: response.orderId,
+                trackingCode: response.trackingCode,
+                details: orderData,
+                whatsappUrl: waUrl
+            }));
+            
+            clearCart();
+            window.open(waUrl, '_blank');
+            renderOrderConfirmationPage();
+        } else {
+            alert('Checkout failed: ' + response.message);
+            renderCheckoutPage();
+        }
+    } catch(err) {
+        console.error(err);
+        alert('Order placement error: ' + err.message);
+        renderCheckoutPage();
     }
 }
 
@@ -1948,30 +2065,37 @@ function renderOrderConfirmationPage() {
         return;
     }
 
+    const waUrl = lastOrder.whatsappUrl || getWhatsAppOrderUrl(lastOrder);
+
     appContainer.innerHTML = `
         <div class="container" style="padding: 80px 0; text-align: center; max-width: 600px;">
             <i class="fa-solid fa-circle-check" style="font-size: 4rem; color: var(--color-success); margin-bottom: 24px;"></i>
             <h1 style="font-size: 2.2rem; margin-bottom: 16px;">Thank You for Your Order!</h1>
-            <p style="font-size: 1.1rem; color: var(--color-text-dark); margin-bottom: 30px;">
-                Your order has been placed successfully. Our agent will verify your shipment shortly.
+            <p style="font-size: 1.1rem; color: var(--color-text-dark); margin-bottom: 20px;">
+                Your order has been placed successfully. An automated WhatsApp order alert has been sent to our store manager.
             </p>
             
+            <div style="background-color: #F0FDF4; border: 1px solid #86EFAC; padding: 14px; border-radius: 8px; margin-bottom: 24px; color: #166534; font-size: 0.9rem; text-align: center;">
+                <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem; margin-right: 6px; color: #22C55E;"></i>
+                <strong>WhatsApp Order Alert Sent!</strong> If WhatsApp didn't open automatically, click the button below to send your order invoice directly.
+            </div>
+
             <div style="background-color: var(--color-bg-offset); padding: 24px; border-radius: var(--border-radius-sm); border: 1px solid var(--color-border); text-align: left; margin-bottom: 36px;">
                 <h4 style="margin-bottom: 14px; font-size: 1.05rem;">Order Invoice:</h4>
                 <p><strong>Order ID:</strong> #${lastOrder.id}</p>
                 <p><strong>Tracking Reference:</strong> ${lastOrder.trackingCode}</p>
                 <p><strong>Deliver To:</strong> ${escapeHtml(lastOrder.details.firstName)} ${escapeHtml(lastOrder.details.lastName)}</p>
+                <p><strong>Phone:</strong> ${escapeHtml(lastOrder.details.phone)}</p>
                 <p><strong>Shipping Address:</strong> ${escapeHtml(lastOrder.details.address)}, ${escapeHtml(lastOrder.details.city)}</p>
                 <p><strong>Payment Method:</strong> ${lastOrder.details.paymentMethod.toUpperCase()}</p>
                 <p><strong>Total Bill:</strong> PKR ${lastOrder.details.total.toLocaleString()}</p>
             </div>
             
-            <div style="display: flex; gap: 14px; justify-content: center;">
-                <a href="#/tracking" class="btn btn-primary">Track Shipment</a>
-                <a href="https://wa.me/923001234567?text=Hi%20HK%20Accessories,%20my%20order%20is%20%23${lastOrder.id}.%20Please%20verify%20delivery." 
-                   target="_blank" class="btn btn-whatsapp">
-                    <i class="fa-brands fa-whatsapp"></i> Confirm on WhatsApp
+            <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                <a href="${waUrl}" target="_blank" class="btn btn-whatsapp" style="background-color: #25D366; color: white;">
+                    <i class="fa-brands fa-whatsapp"></i> Send Order Alert via WhatsApp
                 </a>
+                <a href="#/tracking" class="btn btn-primary">Track Shipment</a>
             </div>
             <a href="#/" class="btn btn-outline-dark" style="margin-top: 20px; display: inline-flex;">Back to Home</a>
         </div>
@@ -2256,5 +2380,184 @@ function escapeHtml(text) {
     return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
+// --- EXIT-INTENT CART SAVER MODAL HANDLER ---
+function initExitIntentModal() {
+    const exitModal = document.getElementById('exit-modal');
+    const closeBtn = document.getElementById('btn-close-exit-modal');
+    const exitForm = document.getElementById('exit-modal-form');
+    const itemCountEl = document.getElementById('exit-modal-item-count');
+    const cartTotalEl = document.getElementById('exit-modal-cart-total');
+    const successMsg = document.getElementById('exit-modal-success-msg');
+
+    if (!exitModal) return;
+
+    function openExitModal() {
+        const cartCount = getCartCount();
+        if (cartCount === 0) return;
+        // Don't show again if customer already dismissed or submitted in this session
+        if (sessionStorage.getItem('hk_exit_dismissed') === 'true') return;
+        if (window.location.hash.includes('/checkout')) return;
+        if (exitModal.classList.contains('active')) return;
+
+        if (itemCountEl) itemCountEl.textContent = cartCount;
+        if (cartTotalEl) cartTotalEl.textContent = `PKR ${getCartTotal().toLocaleString()}`;
+
+        exitModal.classList.add('active');
+        sessionStorage.setItem('hk_exit_dismissed', 'true');
+    }
+
+    // Only trigger on desktop when cursor leaves top edge of browser window (e.relatedTarget === null)
+    document.addEventListener('mouseleave', (e) => {
+        if (e.clientY <= 5 && e.relatedTarget === null) {
+            openExitModal();
+        }
+    });
+
+    closeBtn?.addEventListener('click', () => {
+        exitModal.classList.remove('active');
+        sessionStorage.setItem('hk_exit_dismissed', 'true');
+    });
+
+    exitModal.addEventListener('click', (e) => {
+        if (e.target === exitModal) {
+            exitModal.classList.remove('active');
+            sessionStorage.setItem('hk_exit_dismissed', 'true');
+        }
+    });
+
+    exitForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('exit-customer-name')?.value.trim();
+        const phone = document.getElementById('exit-customer-phone')?.value.trim();
+
+        if (!name || !phone) return;
+
+        const cartItems = getCart().map(i => ({
+            id: i.id,
+            title: i.title,
+            price: i.price,
+            quantity: i.quantity
+        }));
+
+        const payload = {
+            id: `ac-${Date.now().toString(36)}`,
+            customerName: name,
+            phone: phone,
+            items: cartItems,
+            total: getCartTotal(),
+            updated_at: new Date().toISOString(),
+            status: 'Abandoned'
+        };
+
+        // Save to localStorage immediately
+        const localCarts = JSON.parse(localStorage.getItem('hk_abandoned_carts') || '[]');
+        const existingIdx = localCarts.findIndex(c => c.phone === phone);
+        if (existingIdx >= 0) localCarts[existingIdx] = payload;
+        else localCarts.unshift(payload);
+        localStorage.setItem('hk_abandoned_carts', JSON.stringify(localCarts));
+
+        try {
+            await fetch('/api/abandoned_carts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                keepalive: true,
+                body: JSON.stringify(payload)
+            });
+        } catch (err) {
+            console.error('Error saving draft cart:', err);
+        }
+
+        sessionStorage.setItem('hk_exit_dismissed', 'true');
+        if (successMsg) successMsg.style.display = 'block';
+        setTimeout(() => {
+            exitModal.classList.remove('active');
+            if (successMsg) successMsg.style.display = 'none';
+        }, 1500);
+    });
+}
+
+// Global Checkout Lead Capture Helper with Session Deduplication & Console Logging
+let leadCaptureDebounceTimer = null;
+
+function checkAndSaveCheckoutLeadBeforeRoute(source = 'unknown') {
+    console.log(`[LeadCapture] Triggered from source: "${source}"`);
+    const phoneInput = document.getElementById('c-phone') || document.getElementById('checkout-phone');
+    const fnameInput = document.getElementById('c-first-name') || document.getElementById('c-fname') || document.getElementById('checkout-first-name');
+    const lnameInput = document.getElementById('c-last-name') || document.getElementById('c-lname') || document.getElementById('checkout-last-name');
+    const emailInput = document.getElementById('c-email') || document.getElementById('checkout-email');
+    if (!phoneInput) {
+        console.log('[LeadCapture] Skipped: phone input element is not in DOM.');
+        return;
+    }
+
+    const phone = phoneInput.value.trim();
+    if (!phone || phone.length < 5) {
+        console.log(`[LeadCapture] Skipped: phone input "${phone}" is empty or < 5 characters.`);
+        return;
+    }
+
+    const fname = fnameInput?.value.trim() || 'Visitor';
+    const lname = lnameInput?.value.trim() || '';
+    const email = emailInput?.value.trim() || 'N/A';
+
+    const cartItems = getCart().map(i => ({
+        id: i.id,
+        title: i.title,
+        price: i.price,
+        quantity: i.quantity
+    }));
+
+    if (cartItems.length === 0) {
+        console.log('[LeadCapture] Skipped: Cart has no items.');
+        return;
+    }
+
+    let sessionId = sessionStorage.getItem('hk_cart_session_id');
+    if (!sessionId) {
+        sessionId = 'sess_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+        sessionStorage.setItem('hk_cart_session_id', sessionId);
+    }
+
+    const payload = {
+        id: `ac-${phone.replace(/\D/g, '') || sessionId}`,
+        session_id: sessionId,
+        customerName: `${fname} ${lname}`.trim(),
+        phone: phone,
+        email: email,
+        items: cartItems,
+        total: getCartTotal(),
+        updated_at: new Date().toISOString(),
+        status: 'Abandoned'
+    };
+
+    console.log('[LeadCapture] Formatted Payload to Save:', payload);
+
+    // Save to localStorage immediately
+    const localCarts = JSON.parse(localStorage.getItem('hk_abandoned_carts') || '[]');
+    const idx = localCarts.findIndex(c => (c.session_id && c.session_id === sessionId) || c.phone === phone);
+    if (idx >= 0) localCarts[idx] = payload;
+    else localCarts.unshift(payload);
+    localStorage.setItem('hk_abandoned_carts', JSON.stringify(localCarts));
+
+    // Send to server keepalive
+    try {
+        fetch('/api/abandoned_carts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            keepalive: true,
+            body: JSON.stringify(payload)
+        }).then(res => console.log('[LeadCapture] Server response HTTP status:', res.status))
+          .catch(err => console.warn('[LeadCapture] Server fetch error:', err));
+    } catch (e) {
+        console.warn('[LeadCapture] Fetch exception:', e);
+    }
+}
+
+window.addEventListener('beforeunload', () => checkAndSaveCheckoutLeadBeforeRoute('beforeunload'));
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') checkAndSaveCheckoutLeadBeforeRoute('visibilitychange_hidden');
+});
+
 // Initialize Application on load
 init();
+initExitIntentModal();

@@ -1,0 +1,431 @@
+[
+  {
+    "id": "ac-03011234567",
+    "session_id": "sess_ms38tgo3u2lx",
+    "customerName": "Ali Khan",
+    "phone": "03011234567",
+    "email": "ali.khan@example.com",
+    "items": [
+      {
+        "id": 101,
+        "title": "Bridal Kundan Necklace Set",
+        "price": 4500.0,
+        "quantity": 1
+      }
+    ],
+    "total": 4500.0,
+    "updated_at": "2026-07-27T13:08:45.615Z",
+    "status": "Abandoned"
+  },
+  {
+    "id": "ac-03002258458",
+    "session_id": "sess_ms388f1rwtms",
+    "customerName": "usman Truth",
+    "phone": "03002258458",
+    "email": "mrtruth933@gmail.com",
+    "items": [
+      {
+        "id": 13281,
+        "title": "xuping Ring 18K Gold Plated (HK 407)",
+        "price": 1800.0,
+        "quantity": 1
+      }
+    ],
+    "total": 1800.0,
+    "updated_at": "2026-07-27T13:16:36.204Z",
+    "status": "Abandoned"
+  },
+  {
+    "id": "ac-spam-25",
+    "session_id": "sess_spam_25",
+    "customerName": "Spammer25",
+    "phone": "03999990025",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-24",
+    "session_id": "sess_spam_24",
+    "customerName": "Spammer24",
+    "phone": "03999990024",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-23",
+    "session_id": "sess_spam_23",
+    "customerName": "Spammer23",
+    "phone": "03999990023",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-22",
+    "session_id": "sess_spam_22",
+    "customerName": "Spammer22",
+    "phone": "03999990022",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-21",
+    "session_id": "sess_spam_21",
+    "customerName": "Spammer21",
+    "phone": "03999990021",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-20",
+    "session_id": "sess_spam_20",
+    "customerName": "Spammer20",
+    "phone": "03999990020",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-18",
+    "session_id": "sess_spam_18",
+    "customerName": "Spammer18",
+    "phone": "03999990018",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-19",
+    "session_id": "sess_spam_19",
+    "customerName": "Spammer19",
+    "phone": "03999990019",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-17",
+    "session_id": "sess_spam_17",
+    "customerName": "Spammer17",
+    "phone": "03999990017",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-16",
+    "session_id": "sess_spam_16",
+    "customerName": "Spammer16",
+    "phone": "03999990016",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-15",
+    "session_id": "sess_spam_15",
+    "customerName": "Spammer15",
+    "phone": "03999990015",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-14",
+    "session_id": "sess_spam_14",
+    "customerName": "Spammer14",
+    "phone": "03999990014",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-13",
+    "session_id": "sess_spam_13",
+    "customerName": "Spammer13",
+    "phone": "03999990013",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-12",
+    "session_id": "sess_spam_12",
+    "customerName": "Spammer12",
+    "phone": "03999990012",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-11",
+    "session_id": "sess_spam_11",
+    "customerName": "Spammer11",
+    "phone": "03999990011",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-8",
+    "session_id": "sess_spam_8",
+    "customerName": "Spammer8",
+    "phone": "03999990008",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-9",
+    "session_id": "sess_spam_9",
+    "customerName": "Spammer9",
+    "phone": "03999990009",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-7",
+    "session_id": "sess_spam_7",
+    "customerName": "Spammer7",
+    "phone": "03999990007",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-10",
+    "session_id": "sess_spam_10",
+    "customerName": "Spammer10",
+    "phone": "03999990010",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-4",
+    "session_id": "sess_spam_4",
+    "customerName": "Spammer4",
+    "phone": "03999990004",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-3",
+    "session_id": "sess_spam_3",
+    "customerName": "Spammer3",
+    "phone": "03999990003",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-1",
+    "session_id": "sess_spam_1",
+    "customerName": "Spammer1",
+    "phone": "03999990001",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-6",
+    "session_id": "sess_spam_6",
+    "customerName": "Spammer6",
+    "phone": "03999990006",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-2",
+    "session_id": "sess_spam_2",
+    "customerName": "Spammer2",
+    "phone": "03999990002",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-spam-5",
+    "session_id": "sess_spam_5",
+    "customerName": "Spammer5",
+    "phone": "03999990005",
+    "items": [
+      {
+        "productId": 13316,
+        "price": 7200.0,
+        "quantity": 1,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta"
+      }
+    ],
+    "total": 7200.0
+  },
+  {
+    "id": "ac-legit-1",
+    "session_id": "sess_legit_customer_101",
+    "customerName": "Legit Customer",
+    "phone": "03001234567",
+    "email": "customer@test.com",
+    "items": [
+      {
+        "productId": 13316,
+        "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta",
+        "price": 7200.0,
+        "quantity": 5
+      }
+    ],
+    "total": 36000.0,
+    "updated_at": "2026-07-25T16:35:05Z",
+    "status": "Abandoned"
+  }
+]

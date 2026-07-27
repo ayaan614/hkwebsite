@@ -220,7 +220,7 @@ export async function getCategories(department = '') {
  * Get predictive search suggestions by department.
  */
 export async function getSearchSuggestions(query, department = '') {
-    if (!query || query.length < 2) return [];
+    if (!query || query.length < 2) return { suggestions: [], totalMatches: 0 };
 
     await ensureDataLoaded();
     const cleanQuery = query.toLowerCase().trim();
@@ -231,42 +231,145 @@ export async function getSearchSuggestions(query, department = '') {
     }
 
     const matches = filtered.filter(p => 
-        p.title.toLowerCase().includes(cleanQuery) || 
-        p.category.toLowerCase().includes(cleanQuery)
+        (p.title && p.title.toLowerCase().includes(cleanQuery)) || 
+        (p.category && p.category.toLowerCase().includes(cleanQuery)) ||
+        (p.sku && p.sku.toLowerCase().includes(cleanQuery))
     );
 
-    // Return first 6 suggestions grouped or styled
-    return matches.slice(0, 6).map(p => ({
+    const suggestions = matches.slice(0, 5).map(p => ({
         id: p.id,
         title: p.title,
         price: p.price,
-        department: p.department,
-        category: p.category,
-        image: p.images[0]
+        regular_price: p.regular_price || p.price,
+        on_sale: Boolean(p.on_sale && p.regular_price > p.price),
+        department: p.department || 'jewelry',
+        category: p.category || 'General',
+        image: (p.images && p.images.length > 0) ? p.images[0] : 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=100&q=80'
     }));
+
+    return { suggestions, totalMatches: matches.length };
+}
+
+/**
+ * Generates a formatted WhatsApp alert message URL for an order.
+ */
+export function getWhatsAppOrderUrl(orderRecord, recipientPhone = null) {
+    const details = orderRecord.details || orderRecord;
+    const phone = (recipientPhone || localStorage.getItem('hk_admin_wa_phone') || '923174914140').replace(/[^0-9]/g, '');
+
+    const items = details.items || [];
+    const itemsText = items.map((it, idx) => 
+        `  ${idx + 1}. *${it.title || 'Item'}* (Qty: ${it.quantity || 1}) - PKR ${((it.price || 0) * (it.quantity || 1)).toLocaleString()}`
+    ).join('\n');
+
+    const msg = 
+`🚨 *NEW ORDER RECEIVED - HK ACCESSORIES* 🚨
+----------------------------------------
+📌 *Order ID:* #${orderRecord.id || details.id || 'N/A'}
+🚚 *Tracking Ref:* ${orderRecord.trackingCode || 'N/A'}
+📅 *Date:* ${orderRecord.created_at ? new Date(orderRecord.created_at).toLocaleString() : new Date().toLocaleString()}
+
+👤 *CUSTOMER DETAILS:*
+- *Name:* ${details.firstName || ''} ${details.lastName || ''}
+- *Phone:* ${details.phone || 'N/A'}
+- *Email:* ${details.email || 'N/A'}
+- *Delivery Address:* ${details.address || ''}, ${details.city || ''}${details.state ? ', ' + details.state : ''}
+- *Payment Method:* ${(details.paymentMethod || 'COD').toUpperCase()}
+
+🛍️ *ORDER ITEMS:*
+${itemsText || '  (No items)'}
+
+💰 *TOTAL BILL:* PKR ${details.total ? details.total.toLocaleString() : '0'}
+📝 *Special Notes:* ${details.note || 'None'}
+----------------------------------------
+Please verify stock & confirm dispatch with customer.`;
+
+    return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
 }
 
 /**
  * Submits/Places an order.
- * Connects to WooCommerce API if active, otherwise simulates a successful submission.
+ * Generates tracking, formats WhatsApp alert, updates stock, and saves to server database.
  */
 export async function placeOrder(orderData) {
     if (!USE_MOCK_DATA) {
         return createWcOrderInApi(orderData);
     }
 
-    // Simulate network latency
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await ensureDataLoaded();
 
-    // Generate a mock order ID and tracking code
-    const orderId = Math.floor(100000 + randomInt(900000));
-    const trackingCode = `HK-${orderId}-${randomString(4)}`;
+    // Generate a unique numeric Order ID & Tracking Code
+    const orderId = Math.floor(100000 + Math.random() * 900000);
+    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const trackingCode = `HK-${orderId}-${randomSuffix}`;
+
+    const orderRecord = {
+        id: orderId,
+        trackingCode,
+        created_at: new Date().toISOString(),
+        status: 'Pending Verification',
+        details: orderData
+    };
+
+    // Generate WhatsApp Notification URL
+    const whatsappUrl = getWhatsAppOrderUrl(orderRecord);
+    orderRecord.whatsappUrl = whatsappUrl;
+
+    // Save Order to Server API / LocalStorage
+    try {
+        await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderRecord)
+        });
+
+        // Mark abandoned cart as Recovered
+        if (orderData.phone) {
+            await fetch('/api/abandoned_carts/status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: orderData.phone, status: 'Recovered' })
+            });
+            const localCarts = JSON.parse(localStorage.getItem('hk_abandoned_carts') || '[]');
+            const found = localCarts.find(c => c.phone === orderData.phone);
+            if (found) found.status = 'Recovered';
+            localStorage.setItem('hk_abandoned_carts', JSON.stringify(localCarts));
+        }
+    } catch (e) {
+        console.log('Server offline, saving order to localStorage.');
+    }
+
+    // Save to local orders array
+    let allOrders = [];
+    try {
+        allOrders = JSON.parse(localStorage.getItem('hk_all_orders')) || [];
+    } catch(e) {}
+    allOrders.unshift(orderRecord);
+    localStorage.setItem('hk_all_orders', JSON.stringify(allOrders));
+    localStorage.setItem('hk_last_order', JSON.stringify(orderRecord));
+
+    // Deduct stock quantity for ordered items if available
+    if (orderData.items && Array.isArray(orderData.items)) {
+        orderData.items.forEach(item => {
+            const p = cachedProducts.find(prod => prod.id === item.productId);
+            if (p && p.stock_quantity !== null && p.stock_quantity !== undefined) {
+                p.stock_quantity = Math.max(0, p.stock_quantity - (item.quantity || 1));
+                if (p.stock_quantity === 0) {
+                    p.stock_status = 'outofstock';
+                    p.is_in_stock = false;
+                }
+            }
+        });
+        saveCachedProductsToLocalStorage();
+    }
 
     return {
         success: true,
         orderId,
         trackingCode,
         orderData,
+        orderRecord,
+        whatsappUrl,
         message: 'Order created successfully!'
     };
 }
@@ -548,9 +651,14 @@ export async function addProduct(productData) {
     
     // Try backend API first
     try {
+        const token = sessionStorage.getItem('hk_admin_token') || '';
         const res = await fetch('/api/products', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'X-Admin-Token': token
+            },
             body: JSON.stringify(productData)
         });
         if (res.ok) {
@@ -605,9 +713,14 @@ export async function updateProduct(productData) {
 
     // Try backend API
     try {
+        const token = sessionStorage.getItem('hk_admin_token') || '';
         const res = await fetch('/api/products', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'X-Admin-Token': token
+            },
             body: JSON.stringify(productData)
         });
         if (res.ok) {
@@ -651,7 +764,14 @@ export async function deleteProduct(id) {
     const numericId = parseInt(id, 10);
 
     try {
-        const res = await fetch(`/api/products?id=${numericId}`, { method: 'DELETE' });
+        const token = sessionStorage.getItem('hk_admin_token') || '';
+        const res = await fetch(`/api/products?id=${numericId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'X-Admin-Token': token
+            }
+        });
         if (res.ok) {
             cachedProducts = cachedProducts.filter(p => p.id !== numericId);
             saveCachedProductsToLocalStorage();
@@ -671,9 +791,14 @@ export async function applyBulkDiscount(discountPercent, department = '') {
     const pct = parseFloat(discountPercent);
 
     try {
+        const token = sessionStorage.getItem('hk_admin_token') || '';
         const res = await fetch('/api/discounts', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'X-Admin-Token': token
+            },
             body: JSON.stringify({ discountPercent: pct, department })
         });
         if (res.ok) {
@@ -699,4 +824,58 @@ export async function applyBulkDiscount(discountPercent, department = '') {
     saveCachedProductsToLocalStorage();
     return { success: true };
 }
+
+export async function deleteCategory(department, categoryName, targetCategory = 'Uncategorized') {
+    await ensureDataLoaded();
+    const deptLower = (department || '').toLowerCase();
+    const catNameLower = (categoryName || '').toLowerCase();
+
+    try {
+        const token = sessionStorage.getItem('hk_admin_token') || '';
+        const res = await fetch('/api/categories/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'X-Admin-Token': token
+            },
+            body: JSON.stringify({ department, category: categoryName, targetCategory })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+                const reFetch = await fetch('/api/products');
+                if (reFetch.ok) {
+                    cachedProducts = await reFetch.json();
+                } else {
+                    cachedProducts.forEach(p => {
+                        if ((p.department || '').toLowerCase() === deptLower && (p.category || '').toLowerCase() === catNameLower) {
+                            p.category = targetCategory;
+                        }
+                    });
+                }
+                saveCachedProductsToLocalStorage();
+                return { success: true, message: data.message, reassignedCount: data.reassignedCount };
+            }
+        }
+    } catch (err) {
+        console.log('Backend API unavailable, deleting category locally.');
+    }
+
+    let reassignedCount = 0;
+    cachedProducts.forEach(p => {
+        if ((p.department || '').toLowerCase() === deptLower && (p.category || '').toLowerCase() === catNameLower) {
+            p.category = targetCategory;
+            reassignedCount++;
+        }
+    });
+
+    saveCachedProductsToLocalStorage();
+    return { 
+        success: true, 
+        message: `Category "${categoryName}" deleted. ${reassignedCount} products reassigned to "${targetCategory}".`,
+        reassignedCount 
+    };
+}
+
 

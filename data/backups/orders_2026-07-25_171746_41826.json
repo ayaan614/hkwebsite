@@ -1,0 +1,28 @@
+[
+  {
+    "id": 77701,
+    "trackingCode": "HK-77701-PAK",
+    "created_at": "2026-07-25T17:18:00Z",
+    "status": "Pending",
+    "details": {
+      "firstName": "Isolated",
+      "lastName": "OrderCustomer",
+      "phone": "03007770000",
+      "email": "isolated@test.com",
+      "address": "Street 777",
+      "city": "Islamabad",
+      "state": "ICT",
+      "paymentMethod": "cod",
+      "total": 7200.0,
+      "items": [
+        {
+          "productId": 13316,
+          "title": "Stitched Fully Embroidered Black Lawn Dress 3 Pcs with silk Dupatta",
+          "price": 7200.0,
+          "quantity": 1
+        }
+      ],
+      "status": "Pending"
+    }
+  }
+]
