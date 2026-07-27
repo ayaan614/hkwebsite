@@ -856,7 +856,7 @@ async function renderCatalogPage() {
                     </aside>
 
                     <!-- Products List Column -->
-                    <div>
+                    <div class="shop-content">
                         <!-- Top actions bar -->
                         <div class="catalog-top-actions">
                             <div class="results-count">

@@ -3288,12 +3288,70 @@ h1, h2, h3, h4, h5, h6 {
         padding-right: 16px;
     }
 
+    /* Product Card & Grid Fixes for Mobile (STRICTLY <= 768px) */
+    .shop-layout {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+        padding: 16px 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .shop-layout > * {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .shop-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .shop-layout .product-grid,
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .product-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    .filters-sidebar {
+        position: static !important;
+        padding: 14px 16px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .product-details {
+        padding: 12px !important;
+    }
+
     .product-title {
-        white-space: normal;
-        overflow: visible;
-        text-overflow: clip;
-        line-height: 1.3;
-        font-size: 0.95rem;
+        height: auto !important;
+        max-height: 2.6em !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.3 !important;
+        font-size: 0.88rem !important;
+        margin-bottom: 6px !important;
+        white-space: normal !important;
+    }
+
+    .product-pricing {
+        font-size: 0.95rem !important;
+        margin-top: 6px !important;
     }
 
     .admin-container {
