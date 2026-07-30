@@ -415,6 +415,13 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
 
         super().do_GET()
 
+    def end_headers(self):
+        if self.path.endswith('.js') or self.path.endswith('.css') or '?v=' in self.path:
+            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+        super().end_headers()
+
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path

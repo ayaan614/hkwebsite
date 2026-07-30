@@ -67,13 +67,24 @@ function init() {
     });
 
     // Bind global drawer toggles
-    document.getElementById('btn-cart-toggle').addEventListener('click', toggleCartDrawer);
-    document.getElementById('btn-cart-close').addEventListener('click', toggleCartDrawer);
-    cartDrawerOverlay.addEventListener('click', toggleCartDrawer);
+    document.getElementById('btn-cart-toggle')?.addEventListener('click', toggleCartDrawer);
+    document.getElementById('btn-cart-close')?.addEventListener('click', closeCartDrawer);
+    cartDrawerOverlay?.addEventListener('click', closeCartDrawer);
 
-    document.getElementById('btn-mobile-menu-open').addEventListener('click', toggleMobileDrawer);
-    document.getElementById('btn-mobile-menu-close').addEventListener('click', toggleMobileDrawer);
-    mobileDrawerOverlay.addEventListener('click', toggleMobileDrawer);
+    document.getElementById('btn-mobile-menu-open')?.addEventListener('click', toggleMobileDrawer);
+    document.getElementById('btn-mobile-menu-close')?.addEventListener('click', closeMobileDrawer);
+    mobileDrawerOverlay?.addEventListener('click', closeMobileDrawer);
+
+    // Global delegated click listener for cart drawer links & checkout navigation
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+        const href = link.getAttribute('href') || '';
+        if (link.closest('#cart-drawer') || href.includes('#/checkout') || href.includes('checkout.html') || href.includes('#/cart')) {
+            closeCartDrawer();
+            closeMobileDrawer();
+        }
+    });
 
     // Bind Wishlist toggle to show drawer or page (Let's route to a pre-filtered wishlist state or page)
     document.getElementById('btn-wishlist-toggle').addEventListener('click', () => {
