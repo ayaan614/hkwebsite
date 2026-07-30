@@ -142,17 +142,40 @@ function init() {
 }
 
 // --- UTILITY / GENERAL DRAWERS ---
+function openCartDrawer() {
+    if (cartDrawer) cartDrawer.classList.add('active');
+    if (cartDrawerOverlay) cartDrawerOverlay.classList.add('active');
+}
+
+function closeCartDrawer() {
+    if (cartDrawer) cartDrawer.classList.remove('active');
+    if (cartDrawerOverlay) cartDrawerOverlay.classList.remove('active');
+}
+
 function toggleCartDrawer() {
-    cartDrawer.classList.toggle('active');
-    cartDrawerOverlay.classList.toggle('active');
+    if (cartDrawer) cartDrawer.classList.toggle('active');
+    if (cartDrawerOverlay) cartDrawerOverlay.classList.toggle('active');
+}
+
+function closeMobileDrawer() {
+    if (mobileDrawer) mobileDrawer.classList.remove('active');
+    if (mobileDrawerOverlay) mobileDrawerOverlay.classList.remove('active');
+    const openBtn = document.getElementById('btn-mobile-menu-open');
+    if (openBtn) {
+        openBtn.classList.remove('hamburger-open');
+    }
 }
 
 function toggleMobileDrawer() {
-    mobileDrawer.classList.toggle('active');
-    mobileDrawerOverlay.classList.toggle('active');
-    const openBtn = document.getElementById('btn-mobile-menu-open');
-    if (openBtn) {
-        openBtn.classList.toggle('hamburger-open');
+    if (mobileDrawer && mobileDrawer.classList.contains('active')) {
+        closeMobileDrawer();
+    } else {
+        if (mobileDrawer) mobileDrawer.classList.add('active');
+        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add('active');
+        const openBtn = document.getElementById('btn-mobile-menu-open');
+        if (openBtn) {
+            openBtn.classList.add('hamburger-open');
+        }
     }
 }
 
@@ -291,9 +314,9 @@ function handleRoute() {
     
     const route = getRouteInfo();
     
-    // Close mobile drawers
-    mobileDrawer.classList.remove('active');
-    mobileDrawerOverlay.classList.remove('active');
+    // Close all slide-out drawers on route navigation
+    closeCartDrawer();
+    closeMobileDrawer();
     
     // Update active nav links in header
     updateActiveNavLinks(route);
@@ -2350,8 +2373,14 @@ function renderCartDrawer() {
             const variationId = btn.dataset.variationId ? parseInt(btn.dataset.variationId, 10) : null;
             const attrs = JSON.parse(btn.dataset.attrs);
             removeFromCart(id, attrs, variationId);
-
         });
+    });
+
+    // Bind drawer action links (Proceed to Checkout, View Bag, product links) to close drawer on click
+    const drawerActionLinks = cartDrawer?.querySelectorAll('a');
+    drawerActionLinks?.forEach(link => {
+        link.removeEventListener('click', closeCartDrawer);
+        link.addEventListener('click', closeCartDrawer);
     });
 }
 
