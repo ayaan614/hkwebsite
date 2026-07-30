@@ -36,12 +36,13 @@ import {
 function getOptimizedImgTag({ src, alt = '', className = '', width = 400, height = 400, isEager = false, aspectRatio = '1/1', objectFit = 'cover', extraAttrs = '' }) {
     if (!src) return '';
     let optimizedSrc = src;
-    let srcset = '';
     
     if (optimizedSrc.includes('ring_img.jpeg') || optimizedSrc.includes('ring_img.jpg')) {
         optimizedSrc = 'ring_img.webp';
-    } else if (optimizedSrc.includes('/uploads/') && (optimizedSrc.endsWith('.png') || optimizedSrc.endsWith('.jpeg') || optimizedSrc.endsWith('.jpg'))) {
-        optimizedSrc = optimizedSrc.substring(0, optimizedSrc.lastIndexOf('.')) + '.webp';
+    } else if ((optimizedSrc.startsWith('/uploads/') || optimizedSrc.startsWith('uploads/')) && !optimizedSrc.includes('wp-content')) {
+        if (optimizedSrc.endsWith('.png') || optimizedSrc.endsWith('.jpeg') || optimizedSrc.endsWith('.jpg')) {
+            optimizedSrc = optimizedSrc.substring(0, optimizedSrc.lastIndexOf('.')) + '.webp';
+        }
     } else if (optimizedSrc.includes('images.unsplash.com')) {
         try {
             const urlObj = new URL(optimizedSrc);
@@ -50,14 +51,6 @@ function getOptimizedImgTag({ src, alt = '', className = '', width = 400, height
             urlObj.searchParams.set('auto', 'format');
             urlObj.searchParams.set('w', width.toString());
             optimizedSrc = urlObj.toString();
-
-            const wSmall = Math.round(width * 0.75);
-            const wLarge = Math.round(width * 1.5);
-
-            const urlSmall = new URL(optimizedSrc); urlSmall.searchParams.set('w', wSmall.toString());
-            const urlLarge = new URL(optimizedSrc); urlLarge.searchParams.set('w', wLarge.toString());
-
-            srcset = `srcset="${urlSmall.toString()} ${wSmall}w, ${optimizedSrc} ${width}w, ${urlLarge.toString()} ${wLarge}w" sizes="(max-width: 768px) 50vw, ${width}px"`;
         } catch (e) {
             // fallback
         }
@@ -67,7 +60,7 @@ function getOptimizedImgTag({ src, alt = '', className = '', width = 400, height
     const classAttr = className ? `class="${className}"` : '';
     const styleAttr = `style="aspect-ratio: ${aspectRatio}; object-fit: ${objectFit};"`;
 
-    return `<img src="${optimizedSrc}" ${srcset} alt="${escapeHtml(alt)}" ${classAttr} width="${width}" height="${height}" ${loadingAttr} ${styleAttr} ${extraAttrs}>`;
+    return `<img src="${optimizedSrc}" alt="${escapeHtml(alt)}" ${classAttr} width="${width}" height="${height}" ${loadingAttr} ${styleAttr} ${extraAttrs}>`;
 }
 
 // DOM Element Selections
@@ -1174,7 +1167,8 @@ function renderWishlistPage() {
 
 // --- Helper to build Product cards ---
 function renderProductCards(productsList) {
-    return productsList.map(p => {
+    return productsList.map((p, idx) => {
+        const isEager = idx < 4;
         const isWish = isInWishlist(p.id);
         const hasDiscount = p.on_sale && p.regular_price > p.price;
         const discountPct = hasDiscount ? Math.round(((p.regular_price - p.price) / p.regular_price) * 100) : 0;
@@ -1182,7 +1176,7 @@ function renderProductCards(productsList) {
         return `
             <div class="product-card" data-id="${p.id}">
                 <div class="product-image-wrapper">
-                    ${getOptimizedImgTag({ src: p.images[0], alt: p.title, width: 300, height: 300, aspectRatio: "1/1" })}
+                    ${getOptimizedImgTag({ src: p.images[0], alt: p.title, width: 300, height: 300, isEager, aspectRatio: "1/1" })}
                     
                     <div class="product-badges">
                         ${hasDiscount ? `<span class="badge-sale">-${discountPct}% OFF</span>` : ''}
