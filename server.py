@@ -524,7 +524,30 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                     fh.write(file_data)
 
                 file_url = f'/uploads/{safe_name}'
-                print(f'[UPLOAD] Saved: {save_path} -> {file_url}')
+                
+                # Auto-generate optimized WebP version
+                try:
+                    from PIL import Image
+                    import io
+                    img = Image.open(io.BytesIO(file_data))
+                    webp_name = f"{uuid.uuid4().hex}.webp"
+                    webp_path = os.path.abspath(os.path.join(target_dir, webp_name))
+                    
+                    if img.width > 1200 or img.height > 1200:
+                        img.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
+                        
+                    if img.mode in ('RGBA', 'LA', 'P'):
+                        rgb_img = img.convert('RGB')
+                    else:
+                        rgb_img = img
+                        
+                    rgb_img.save(webp_path, 'WEBP', quality=82, optimize=True)
+                    file_url = f'/uploads/{webp_name}'
+                    safe_name = webp_name
+                    print(f'[UPLOAD OPTIMIZED WEBP] Created: {webp_path} -> {file_url}')
+                except Exception as img_err:
+                    print(f'[UPLOAD OPTIMIZE WARNING] {img_err}')
+
                 self._send_json({'success': True, 'url': file_url, 'filename': safe_name})
 
             except Exception as e:

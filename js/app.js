@@ -31,6 +31,45 @@ import {
     isProductInStock
 } from './store.js';
 
+
+// --- IMAGE OPTIMIZATION HELPER ---
+function getOptimizedImgTag({ src, alt = '', className = '', width = 400, height = 400, isEager = false, aspectRatio = '1/1', objectFit = 'cover', extraAttrs = '' }) {
+    if (!src) return '';
+    let optimizedSrc = src;
+    let srcset = '';
+    
+    if (optimizedSrc.includes('ring_img.jpeg') || optimizedSrc.includes('ring_img.jpg')) {
+        optimizedSrc = 'ring_img.webp';
+    } else if (optimizedSrc.includes('/uploads/') && (optimizedSrc.endsWith('.png') || optimizedSrc.endsWith('.jpeg') || optimizedSrc.endsWith('.jpg'))) {
+        optimizedSrc = optimizedSrc.substring(0, optimizedSrc.lastIndexOf('.')) + '.webp';
+    } else if (optimizedSrc.includes('images.unsplash.com')) {
+        try {
+            const urlObj = new URL(optimizedSrc);
+            urlObj.searchParams.set('fm', 'webp');
+            urlObj.searchParams.set('q', '80');
+            urlObj.searchParams.set('auto', 'format');
+            urlObj.searchParams.set('w', width.toString());
+            optimizedSrc = urlObj.toString();
+
+            const wSmall = Math.round(width * 0.75);
+            const wLarge = Math.round(width * 1.5);
+
+            const urlSmall = new URL(optimizedSrc); urlSmall.searchParams.set('w', wSmall.toString());
+            const urlLarge = new URL(optimizedSrc); urlLarge.searchParams.set('w', wLarge.toString());
+
+            srcset = `srcset="${urlSmall.toString()} ${wSmall}w, ${optimizedSrc} ${width}w, ${urlLarge.toString()} ${wLarge}w" sizes="(max-width: 768px) 50vw, ${width}px"`;
+        } catch (e) {
+            // fallback
+        }
+    }
+
+    const loadingAttr = isEager ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" decoding="async"';
+    const classAttr = className ? `class="${className}"` : '';
+    const styleAttr = `style="aspect-ratio: ${aspectRatio}; object-fit: ${objectFit};"`;
+
+    return `<img src="${optimizedSrc}" ${srcset} alt="${escapeHtml(alt)}" ${classAttr} width="${width}" height="${height}" ${loadingAttr} ${styleAttr} ${extraAttrs}>`;
+}
+
 // DOM Element Selections
 const appContainer = document.getElementById('app');
 const cartDrawer = document.getElementById('cart-drawer');
@@ -461,7 +500,7 @@ async function renderHomePage() {
         let html = `
             <!-- 1. Hero Banner (Jewelry Focused) -->
             <section class="hero-banner">
-                <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1600&q=80" alt="HK Accessories Jewelry" class="hero-bg">
+                ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1605100804763-247f67b3557e", alt: "HK Accessories Jewelry", className: "hero-bg", width: 1600, height: 600, isEager: true, aspectRatio: "16/9" })}
                 <div class="hero-overlay"></div>
                 <div class="container">
                     <div class="hero-content">
@@ -487,7 +526,7 @@ async function renderHomePage() {
                         ${jewelryCats.slice(0, 6).map(cat => `
                             <a href="#/jewelry/${cat.name}" class="category-card">
                                 <div class="category-img-wrapper">
-                                    <img src="${cat.image || 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=300&q=80'}" alt="${cat.name}">
+                                    ${getOptimizedImgTag({ src: cat.image || "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=400&q=80", alt: cat.name, width: 400, height: 300, aspectRatio: "4/3" })}
                                 </div>
                                 <h3>${escapeHtml(cat.name)}</h3>
                             </a>
@@ -534,7 +573,7 @@ async function renderHomePage() {
                         <a href="#/jewelry/Couple Rings" class="btn btn-gold">Shop Couple Collection</a>
                     </div>
                     <div class="campaign-img-wrapper">
-                        <img src="ring_img.jpeg" alt="Couple Rings Gift">
+                        ${getOptimizedImgTag({ src: "ring_img.webp", alt: "Couple Rings Gift", width: 600, height: 600, aspectRatio: "1/1" })}
                     </div>
                 </div>
             </section>
@@ -549,7 +588,7 @@ async function renderHomePage() {
                     <div class="departments-grid">
                         <!-- Diecast Card -->
                         <div class="dept-card">
-                            <img src="https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=600&q=80" alt="Diecast Collectibles" class="dept-card-bg">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f", alt: "Diecast Collectibles", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Diecast Department</h3>
                                 <p>Premium heavy alloy model cars, motorbikes and collectibles.</p>
@@ -558,7 +597,7 @@ async function renderHomePage() {
                         </div>
                         <!-- Toys Card -->
                         <div class="dept-card">
-                            <img src="https://images.unsplash.com/photo-1566576912321-d58edd7a26a4?auto=format&fit=crop&w=600&q=80" alt="Premium Toys" class="dept-card-bg">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1566576912321-d58edd7a26a4", alt: "Premium Toys", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Toys & Games</h3>
                                 <p>Action figures, educational puzzle blocks, and remote control cars.</p>
@@ -567,7 +606,7 @@ async function renderHomePage() {
                         </div>
                         <!-- Clothing Card -->
                         <div class="dept-card">
-                            <img src="https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=600&q=80" alt="Clothing Apparel" class="dept-card-bg">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1562157873-818bc0726f68", alt: "Clothing Apparel", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Clothing Department</h3>
                                 <p>Relaxed-fit cotton tees, fleece hoodies, and trendy apparel.</p>
@@ -822,7 +861,7 @@ async function renderCatalogPage() {
             <div class="container">
                 <!-- 1. Department Promotion Banner -->
                 <div class="dept-banner">
-                    <img src="${deptInfo.image}" alt="${deptInfo.title}" class="dept-banner-bg">
+                    ${getOptimizedImgTag({ src: deptInfo.image, alt: deptInfo.title, className: "dept-banner-bg", width: 1600, height: 400, isEager: true, aspectRatio: "16/5" })}
                     <div class="dept-banner-overlay">
                         <h1>${escapeHtml(deptInfo.title)}</h1>
                         <p>${escapeHtml(deptInfo.subtitle)}</p>
@@ -1143,7 +1182,7 @@ function renderProductCards(productsList) {
         return `
             <div class="product-card" data-id="${p.id}">
                 <div class="product-image-wrapper">
-                    <img src="${p.images[0]}" alt="${p.title}">
+                    ${getOptimizedImgTag({ src: p.images[0], alt: p.title, width: 300, height: 300, aspectRatio: "1/1" })}
                     
                     <div class="product-badges">
                         ${hasDiscount ? `<span class="badge-sale">-${discountPct}% OFF</span>` : ''}
@@ -1254,12 +1293,12 @@ async function renderProductDetailPage(id) {
                     <!-- Left: Images Column -->
                     <div class="product-gallery">
                         <div class="main-image-wrapper">
-                            <img src="${product.images[0]}" alt="${product.title}" id="main-product-gallery-img">
+                            ${getOptimizedImgTag({ src: product.images[0], alt: product.title, width: 800, height: 800, isEager: true, aspectRatio: "1/1", extraAttrs: 'id="main-product-gallery-img"' })}
                         </div>
                         <div class="thumbnails-grid">
                             ${product.images.map((img, idx) => `
                                 <div class="thumbnail-item ${idx === 0 ? 'active' : ''}" data-src="${img}">
-                                    <img src="${img}" alt="${product.title} Thumb ${idx + 1}">
+                                    ${getOptimizedImgTag({ src: img, alt: `${product.title} Thumb ${idx + 1}`, width: 120, height: 120, aspectRatio: "1/1" })}
                                 </div>
                             `).join('')}
                         </div>
@@ -1600,7 +1639,7 @@ function renderCartPage() {
                         ${items.map(item => `
                             <div class="cart-item-row" data-id="${item.id}" data-attrs='${JSON.stringify(item.selectedAttributes)}'>
                                 <div class="cart-item-info">
-                                    <img src="${item.image}" alt="${item.title}" class="cart-item-img">
+                                    ${getOptimizedImgTag({ src: item.image, alt: item.title, className: "cart-item-img", width: 100, height: 100, aspectRatio: "1/1" })}
                                     <div class="cart-item-details">
                                         <h3><a href="#/product/${item.id}">${escapeHtml(item.title)}</a></h3>
                                         ${Object.keys(item.selectedAttributes).length > 0 ? `
@@ -1878,7 +1917,7 @@ function renderCheckoutPage() {
                     <div class="order-items-list">
                         ${items.map(item => `
                             <div class="checkout-item-row">
-                                <img src="${item.image}" alt="${item.title}" class="checkout-item-img">
+                                ${getOptimizedImgTag({ src: item.image, alt: item.title, className: "checkout-item-img", width: 80, height: 80, aspectRatio: "1/1" })}
                                 <div class="checkout-item-info">
                                     <div class="checkout-item-title">${escapeHtml(item.title)}</div>
                                     <div class="checkout-item-qty">Qty: ${item.quantity} ${Object.keys(item.selectedAttributes).length > 0 ? `| ${Object.values(item.selectedAttributes).join(', ')}` : ''}</div>
@@ -2359,7 +2398,7 @@ function renderCartDrawer() {
 
     itemsContainer.innerHTML = items.map(item => `
         <div class="drawer-item" data-id="${item.id}">
-            <img src="${item.image}" alt="${item.title}" class="drawer-item-img">
+            ${getOptimizedImgTag({ src: item.image, alt: item.title, className: "drawer-item-img", width: 80, height: 80, aspectRatio: "1/1" })}
             <div class="drawer-item-info">
                 <a href="#/product/${item.id}" class="drawer-item-title">${escapeHtml(item.title)}</a>
                 ${Object.keys(item.selectedAttributes).length > 0 ? `
