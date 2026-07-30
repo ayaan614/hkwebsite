@@ -15,41 +15,58 @@ export function isProductInStock(p) {
 // --- Routing State ---
 export function getRouteInfo() {
     let hash = window.location.hash || '';
+    let hashPath = hash;
+    let queryString = '';
+
+    if (hash.includes('?')) {
+        const querySplit = hash.split('?');
+        hashPath = querySplit[0];
+        queryString = querySplit[1] || '';
+    }
     
     // If hash is missing or standard root, check standalone HTML filename or URL query params
-    if (!hash || hash === '#/' || hash === '#') {
+    if (!hashPath || hashPath === '#/' || hashPath === '#') {
         const pathName = window.location.pathname.split('/').pop().toLowerCase();
         const urlParams = new URLSearchParams(window.location.search);
 
-        if (pathName === 'contact.html') hash = '#/contact';
-        else if (pathName === 'about.html') hash = '#/about';
-        else if (pathName === 'cart.html') hash = '#/cart';
-        else if (pathName === 'checkout.html') hash = '#/checkout';
-        else if (pathName === 'tracking.html') hash = '#/tracking';
-        else if (pathName === 'wishlist.html') hash = '#/wishlist';
+        if (pathName === 'contact.html') hashPath = '#/contact';
+        else if (pathName === 'about.html') hashPath = '#/about';
+        else if (pathName === 'cart.html') hashPath = '#/cart';
+        else if (pathName === 'checkout.html') hashPath = '#/checkout';
+        else if (pathName === 'tracking.html') hashPath = '#/tracking';
+        else if (pathName === 'wishlist.html') hashPath = '#/wishlist';
         else if (pathName === 'shop.html') {
             const dept = urlParams.get('dept') || '';
             const cat = urlParams.get('cat') || '';
-            if (dept && cat) hash = `#/${dept}/${cat}`;
-            else if (dept) hash = `#/${dept}`;
-            else hash = '#/jewelry';
+            if (dept && cat) hashPath = `#/${dept}/${cat}`;
+            else if (dept) hashPath = `#/${dept}`;
+            else hashPath = '#/jewelry';
         } else if (pathName === 'product.html') {
             const id = urlParams.get('id') || '';
-            if (id) hash = `#/product/${id}`;
+            if (id) hashPath = `#/product/${id}`;
         } else {
-            hash = '#/';
+            hashPath = '#/';
         }
     }
 
-    const path = hash.slice(1); // Remove '#'
+    const path = hashPath.slice(1); // Remove '#'
     const parts = path.split('/').filter(p => p !== '');
     
+    const queryParams = {};
+    if (queryString) {
+        const searchParams = new URLSearchParams(queryString);
+        for (const [k, v] of searchParams.entries()) {
+            queryParams[k] = v;
+        }
+    }
+
     return {
         hash,
         path,
         page: parts[0] || 'home',
-        param: parts[1] || null,
-        subParam: parts[2] || null
+        param: parts[1] ? decodeURIComponent(parts[1]) : null,
+        subParam: parts[2] ? decodeURIComponent(parts[2]) : null,
+        queryParams
     };
 }
 

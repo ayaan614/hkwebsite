@@ -519,7 +519,7 @@ async function renderHomePage() {
                         ${jewelryCats.slice(0, 6).map(cat => `
                             <a href="#/jewelry/${cat.name}" class="category-card">
                                 <div class="category-img-wrapper">
-                                    ${getOptimizedImgTag({ src: cat.image || "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=400&q=80", alt: cat.name, width: 400, height: 300, aspectRatio: "4/3" })}
+                                    ${getOptimizedImgTag({ src: cat.image || "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=400&q=80", alt: cat.name, width: 400, height: 300, isEager: true, aspectRatio: "4/3" })}
                                 </div>
                                 <h3>${escapeHtml(cat.name)}</h3>
                             </a>
@@ -581,7 +581,7 @@ async function renderHomePage() {
                     <div class="departments-grid">
                         <!-- Diecast Card -->
                         <div class="dept-card">
-                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f", alt: "Diecast Collectibles", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908", alt: "Diecast Collectibles", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Diecast Department</h3>
                                 <p>Premium heavy alloy model cars, motorbikes and collectibles.</p>
@@ -590,7 +590,7 @@ async function renderHomePage() {
                         </div>
                         <!-- Toys Card -->
                         <div class="dept-card">
-                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1566576912321-d58edd7a26a4", alt: "Premium Toys", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338", alt: "Premium Toys", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Toys & Games</h3>
                                 <p>Action figures, educational puzzle blocks, and remote control cars.</p>
@@ -599,7 +599,7 @@ async function renderHomePage() {
                         </div>
                         <!-- Clothing Card -->
                         <div class="dept-card">
-                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1562157873-818bc0726f68", alt: "Clothing Apparel", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1605100804763-247f67b3557e", alt: "Clothing Apparel", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Clothing Department</h3>
                                 <p>Relaxed-fit cotton tees, fleece hoodies, and trendy apparel.</p>
@@ -744,50 +744,38 @@ async function renderHomePage() {
                     </div>
                     <div class="social-grid">
                         <div class="social-item">
-                            <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=400&q=80" alt="Jewelry IG">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f", alt: "Jewelry IG", width: 300, height: 300, isEager: false })}
                             <div class="social-item-overlay"><i class="fa-brands fa-instagram"></i></div>
                         </div>
                         <div class="social-item">
-                            <img src="https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?auto=format&fit=crop&w=400&q=80" alt="Diecast IG">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f", alt: "Diecast IG", width: 300, height: 300, isEager: false })}
                             <div class="social-item-overlay"><i class="fa-brands fa-instagram"></i></div>
                         </div>
                         <div class="social-item">
-                            <img src="https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=400&q=80" alt="Earrings IG">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9", alt: "Earrings IG", width: 300, height: 300, isEager: false })}
                             <div class="social-item-overlay"><i class="fa-brands fa-instagram"></i></div>
                         </div>
                         <div class="social-item">
-                            <img src="https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=400&q=80" alt="Clothing Apparel IG">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1605100804763-247f67b3557e", alt: "Clothing Apparel IG", width: 300, height: 300, isEager: false })}
                             <div class="social-item-overlay"><i class="fa-brands fa-instagram"></i></div>
                         </div>
                         <div class="social-item">
-                            <img src="https://images.unsplash.com/photo-1629224316810-9d8805b95e76?auto=format&fit=crop&w=400&q=80" alt="Box IG">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1629224316810-9d8805b95e76", alt: "Box IG", width: 300, height: 300, isEager: false })}
                             <div class="social-item-overlay"><i class="fa-brands fa-instagram"></i></div>
                         </div>
                         <div class="social-item">
-                            <img src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=400&q=80" alt="Toys IG">
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1587654780291-39c9404d746b", alt: "Toys IG", width: 300, height: 300, isEager: false })}
                             <div class="social-item-overlay"><i class="fa-brands fa-instagram"></i></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 13. Newsletter Banner -->
-            <section class="newsletter-sec">
-                <div class="container newsletter-content">
-                    <h2>Unlock 10% Off Your First Order</h2>
-                    <p>Enter your email and subscribe to receive our special discount code instantly via email, plus updates on new product launches.</p>
-                    <form class="newsletter-form-wide" id="newsletter-form-wide">
-                        <input type="email" placeholder="Your Email Address" required>
-                        <button type="submit" class="btn btn-gold">Subscribe</button>
-                    </form>
-                </div>
-            </section>
         `;
 
         appContainer.innerHTML = html;
 
         // Bind homepage forms
-        document.getElementById('newsletter-form-wide').addEventListener('submit', handleNewsletterSubmit);
         bindProductCardEvents();
     } catch(err) {
         console.error(err);
@@ -798,12 +786,13 @@ async function renderHomePage() {
 // --- 2. DEPARTMENT & CATALOG VIEW ---
 async function handleCatalogRouting(department, categoryParam = null) {
     renderLoader(appContainer);
+    const route = getRouteInfo();
     
     // Reset or update global catalog filter state
     catalogFilters.department = department;
     catalogFilters.category = categoryParam ? decodeURIComponent(categoryParam) : '';
-    catalogFilters.priceMin = '';
-    catalogFilters.priceMax = '';
+    catalogFilters.priceMin = route.queryParams?.priceMin || '';
+    catalogFilters.priceMax = route.queryParams?.priceMax || '';
     catalogFilters.onSale = false;
     catalogFilters.page = 1;
     
@@ -995,19 +984,19 @@ function getDepartmentDetails(dept) {
             return {
                 title: 'Diecast Department',
                 subtitle: 'Accurately detailed scale replicas in alloy metals and rubber components.',
-                image: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=1600&q=80'
+                image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1600&q=80'
             };
         case 'toys':
             return {
                 title: 'Toys & Brain Puzzles',
                 subtitle: 'Safe, premium action figures, modular sets, STEM block kits and interactive puzzles.',
-                image: 'https://images.unsplash.com/photo-1566576912321-d58edd7a26a4?auto=format&fit=crop&w=1600&q=80'
+                image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1600&q=80'
             };
         case 'clothing':
             return {
                 title: 'Casual Clothing Apparel',
                 subtitle: 'Relaxed fit tees, double needle Fleece hoodies and premium accessories.',
-                image: 'https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1600&q=80'
+                image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1600&q=80'
             };
         default:
             return {
