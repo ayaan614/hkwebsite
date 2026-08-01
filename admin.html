@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Base Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=17">
+    <link rel="stylesheet" href="style.css?v=29">
     <!-- Chart.js for Analytics Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -750,6 +750,7 @@
             <button id="btn-open-add-modal" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus"></i> Add Product</button>
             <button id="btn-open-discount-modal" class="btn btn-outline-dark btn-sm" style="border-color:#C9A84C; color:#C9A84C;"><i class="fa-solid fa-percent"></i> Run Discount</button>
             <a href="index.html" class="btn btn-sm btn-outline-dark" style="border-color:#FFF; color:#FFF;"><i class="fa-solid fa-store"></i> View Store</a>
+            <button id="btn-admin-logout" class="btn btn-sm btn-outline-dark" style="border-color:#EF4444; color:#EF4444;"><i class="fa-solid fa-lock"></i> Lock Admin</button>
         </div>
     </header>
 
@@ -1443,17 +1444,17 @@
             <h3 style="margin-bottom: 8px; font-family: 'Cinzel', serif;">Admin Security Authentication</h3>
             <p style="font-size: 0.85rem; color: #64748B; margin-bottom: 20px;">Please enter your Admin Passcode to manage store inventory.</p>
             
-            <form id="auth-form">
+            <form id="auth-form" onsubmit="event.preventDefault();">
                 <div class="form-field" style="margin-bottom: 16px;">
                     <input type="password" id="auth-key" placeholder="Enter Admin Security Key" required style="text-align: center; font-size: 1.1rem; letter-spacing: 2px;">
                 </div>
-                <div id="auth-error" style="color: #EF4444; font-size: 0.82rem; margin-bottom: 12px; display: none;">Invalid Passcode. Try default passcode: <strong>admin123</strong></div>
-                <button type="submit" class="btn btn-gold btn-full">Authenticate Access</button>
+                <div id="auth-error" style="color: #EF4444; font-size: 0.82rem; margin-bottom: 12px; display: none;">Invalid Passcode. Please enter your valid admin security key.</div>
+                <button type="submit" id="btn-auth-submit" class="btn btn-gold btn-full">Authenticate Access</button>
             </form>
         </div>
     </div>
 
     <!-- CMS Controller Script -->
-    <script type="module" src="js/admin.js"></script>
+    <script type="module" src="js/admin.js?v=29"></script>
 </body>
 </html>

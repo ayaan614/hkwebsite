@@ -230,7 +230,7 @@ def save_abandoned_carts(carts):
 import time
 
 # Server-Side Admin Authentication Configuration
-ADMIN_SECRET_KEY = os.environ.get('ADMIN_PASSCODE', 'admin123')
+ADMIN_SECRET_KEY = os.environ.get('ADMIN_PASSCODE', 'hkayaan307')
 TOKEN_TTL_SECONDS = int(os.environ.get('TOKEN_TTL', 7200))  # Default: 2 hours
 
 # Active Tokens Map: { token_string: expiry_timestamp }
@@ -238,8 +238,8 @@ ACTIVE_ADMIN_TOKENS = {}
 
 # Rate Limiting Tracker: { client_ip: [timestamp1, timestamp2, ...] }
 FAILED_LOGIN_ATTEMPTS = {}
-MAX_FAILED_LOGIN_ATTEMPTS = 5
-LOCKOUT_WINDOW_SECONDS = 600  # 10 minutes
+MAX_FAILED_LOGIN_ATTEMPTS = 50
+LOCKOUT_WINDOW_SECONDS = 60  # 1 minute
 
 # Public Storefront API Rate Limiting (Independent Endpoint Buckets)
 CARTS_API_REQUESTS = {}
@@ -585,8 +585,8 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
 
             passcode = str(payload.get('passcode', '')).strip()
 
-            # Strict comparison with ADMIN_SECRET_KEY
-            if passcode and passcode == ADMIN_SECRET_KEY:
+            # Flexible case-insensitive comparison with ADMIN_SECRET_KEY
+            if passcode and passcode.lower() == ADMIN_SECRET_KEY.lower():
                 token = f"adm_token_{uuid.uuid4().hex}"
                 expiry_time = now + TOKEN_TTL_SECONDS
                 ACTIVE_ADMIN_TOKENS[token] = expiry_time

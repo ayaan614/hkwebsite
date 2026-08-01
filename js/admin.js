@@ -80,11 +80,6 @@ const discountForm = document.getElementById('discount-form');
 
 const orderModal = document.getElementById('order-detail-modal');
 
-const authModal = document.getElementById('auth-modal');
-const authForm = document.getElementById('auth-form');
-const authKeyInput = document.getElementById('auth-key');
-const authError = document.getElementById('auth-error');
-
 // Alert Banner helper
 function showAlert(msg, type = 'success') {
     const box = document.getElementById('admin-alert-box');
@@ -115,56 +110,33 @@ function showAlert(msg, type = 'success') {
 }
 
 // Initialize Admin Panel
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdmin);
+} else {
     initAdmin();
+}
 
-    // Threshold input: re-run stats + filters when changed
-    const thresholdInput = document.getElementById('low-stock-threshold');
-    thresholdInput?.addEventListener('input', () => {
-        updateStats();
-        applyFilters();
-    });
-
-    // Banner "Filter Low Stock" link
-    document.getElementById('low-stock-filter-link')?.addEventListener('click', () => {
-        const stockFilter = document.getElementById('admin-stock-filter');
-        if (stockFilter) { stockFilter.value = 'lowstock'; applyFilters(); }
-    });
-
-    // Stat card click => filter low stock
-    document.getElementById('stat-card-lowstock')?.addEventListener('click', () => {
-        const stockFilter = document.getElementById('admin-stock-filter');
-        if (stockFilter) { stockFilter.value = 'lowstock'; applyFilters(); }
-        // Switch to inventory tab
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        const invBtn = document.querySelector('[data-tab="tab-inventory"]');
-        const invTab = document.getElementById('tab-inventory');
-        if (invBtn) invBtn.classList.add('active');
-        if (invTab) invTab.classList.add('active');
-    });
-
-    // Inject pulse-warn keyframes for low stock stat card animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes pulse-warn {
-            0%, 100% { box-shadow: 0 2px 8px rgba(239,68,68,0.15); }
-            50%       { box-shadow: 0 2px 20px rgba(239,68,68,0.40); }
-        }
-    `;
-    document.head.appendChild(style);
-});
+// Inject pulse-warn keyframes for low stock stat card animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulse-warn {
+        0%, 100% { box-shadow: 0 2px 8px rgba(239,68,68,0.15); }
+        50%       { box-shadow: 0 2px 20px rgba(239,68,68,0.40); }
+    }
+`;
+if (document.head) document.head.appendChild(style);
 
 
 async function checkAuth() {
-    const token = sessionStorage.getItem('hk_admin_token');
+    const authModal = document.getElementById('auth-modal');
+    const authKeyInput = document.getElementById('auth-key');
     const urlParams = new URLSearchParams(window.location.search);
     const keyParam = urlParams.get('key') || urlParams.get('secret');
 
-    if (token) {
-        if (authModal) authModal.classList.remove('active');
-        return true;
-    }
+    // Always require passcode on open (clear any auto-saved tokens)
+    sessionStorage.removeItem('hk_admin_token');
+    localStorage.removeItem('hk_admin_token');
+    if (authKeyInput) authKeyInput.value = '';
 
     if (keyParam) {
         try {
@@ -177,6 +149,7 @@ async function checkAuth() {
                 const data = await res.json();
                 if (data.success && data.token) {
                     sessionStorage.setItem('hk_admin_token', data.token);
+                    localStorage.setItem('hk_admin_token', data.token);
                     if (authModal) authModal.classList.remove('active');
                     return true;
                 }
@@ -189,31 +162,57 @@ async function checkAuth() {
 }
 
 async function initAdmin() {
+    const authForm = document.getElementById('auth-form');
+    const authKeyInput = document.getElementById('auth-key');
+    const authError = document.getElementById('auth-error');
+    const authModal = document.getElementById('auth-modal');
+
     bindEvents();
-    initImageUploader();
-    if (authForm) {
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const val = authKeyInput.value.trim();
-            try {
-                const res = await fetch('/api/admin/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ passcode: val })
-                });
-                const data = await res.json();
-                if (res.ok && data.success && data.token) {
-                    sessionStorage.setItem('hk_admin_token', data.token);
-                    authModal.classList.remove('active');
-                    if (authError) authError.style.display = 'none';
-                    await loadProducts();
-                    initAnalytics();
-                } else {
-                    if (authError) authError.style.display = 'block';
+    const doLogin = async (e) => {
+        if (e) e.preventDefault();
+        const val = (authKeyInput?.value || '').trim();
+        if (!val) return;
+
+        try {
+            const res = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ passcode: val })
+            });
+            const data = await res.json();
+            if (res.ok && data.success && data.token) {
+                sessionStorage.setItem('hk_admin_token', data.token);
+                localStorage.setItem('hk_admin_token', data.token);
+                if (authModal) authModal.classList.remove('active');
+                if (authError) authError.style.display = 'none';
+                await loadProducts();
+                initAnalytics();
+            } else {
+                if (authError) {
+                    authError.textContent = data.error || 'Invalid Passcode. Please try again.';
+                    authError.style.display = 'block';
                 }
-            } catch (err) {
-                if (authError) authError.style.display = 'block';
             }
+        } catch (err) {
+            if (authError) {
+                authError.textContent = 'Connection error. Please try again.';
+                authError.style.display = 'block';
+            }
+        }
+    };
+
+    if (authForm) {
+        authForm.addEventListener('submit', doLogin);
+    }
+
+    const btnLogout = document.getElementById('btn-admin-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            sessionStorage.removeItem('hk_admin_token');
+            localStorage.removeItem('hk_admin_token');
+            if (authModal) authModal.classList.add('active');
+            if (authKeyInput) authKeyInput.value = '';
+            showAlert('Admin panel locked. Enter passcode to access.', 'info');
         });
     }
 
@@ -736,26 +735,6 @@ function getSavedOrders() {
         }
     });
 
-    // Provide mock order if empty for demo review
-    if (uniqueOrders.length === 0) {
-        uniqueOrders.push({
-            id: 108492,
-            trackingCode: 'HK-108492-PAK',
-            details: {
-                firstName: 'Zain',
-                lastName: 'Ahmed',
-                phone: '03001234567',
-                email: 'zain.ahmed@example.com',
-                address: 'House #42, Block C, Gulberg III',
-                city: 'Lahore',
-                state: 'Punjab',
-                paymentMethod: 'cod',
-                total: 7200,
-                status: 'Confirmed'
-            }
-        });
-    }
-
     return uniqueOrders;
 }
 
@@ -782,6 +761,11 @@ function renderOrdersTab() {
     }
 
     const orders = getSavedOrders();
+
+    if (orders.length === 0) {
+        ordersTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #64748B; padding: 40px 0;">No customer orders found. Placed orders will appear here automatically.</td></tr>`;
+        return;
+    }
 
     ordersTableBody.innerHTML = orders.map(o => {
         const d = o.details || {};
@@ -1033,85 +1017,7 @@ let currentAnalyticsRange = '30days';
 let chartInstances = {};
 
 function ensureAnalyticsOrderHistoryData() {
-    // If admin explicitly cleared demo data, do not auto-reseed
-    if (localStorage.getItem('hk_demo_cleared') === 'true') return;
-
-    let orders = getSavedOrders();
-    // If orders volume is low (< 12), seed realistic historical order data so charts are rich & interactive
-    if (orders.length < 12 && allProducts.length > 0) {
-        const sampleCustomers = [
-            { name: 'Zain Ahmed', phone: '03001234567', city: 'Lahore', email: 'zain@example.com' },
-            { name: 'Aisha Khan', phone: '03129876543', city: 'Karachi', email: 'aisha@example.com' },
-            { name: 'Bilal Raza', phone: '03334567890', city: 'Islamabad', email: 'bilal@example.com' },
-            { name: 'Sana Fatima', phone: '03017654321', city: 'Lahore', email: 'sana@example.com' },
-            { name: 'Usman Malik', phone: '03218765432', city: 'Rawalpindi', email: 'usman@example.com' },
-            { name: 'Hira Shah', phone: '03456789012', city: 'Faisalabad', email: 'hira@example.com' },
-            { name: 'Omer Farooq', phone: '03023456789', city: 'Peshawar', email: 'omer@example.com' },
-            { name: 'Mariam Ali', phone: '03159876543', city: 'Multan', email: 'mariam@example.com' }
-        ];
-
-        const statuses = ['Completed', 'Completed', 'Completed', 'Completed', 'Completed', 'Pending', 'Cancelled', 'Refunded'];
-        const mockOrders = [];
-        const now = new Date();
-
-        // Generate 45 orders over the last 40 days
-        for (let i = 0; i < 45; i++) {
-            const daysAgo = Math.floor(Math.random() * 40);
-            const orderDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
-            const customer = sampleCustomers[Math.floor(Math.random() * sampleCustomers.length)];
-            const orderId = 108400 + i;
-            const status = statuses[Math.floor(Math.random() * statuses.length)];
-
-            // Pick 1 to 3 random products
-            const itemsCount = Math.floor(Math.random() * 2) + 1;
-            const items = [];
-            let total = 0;
-
-            for (let j = 0; j < itemsCount; j++) {
-                const prod = allProducts[Math.floor(Math.random() * allProducts.length)];
-                const qty = Math.floor(Math.random() * 2) + 1;
-                const price = prod.price || 1500;
-                total += price * qty;
-                items.push({
-                    productId: prod.id,
-                    title: prod.title,
-                    price: price,
-                    quantity: qty,
-                    department: prod.department || 'jewelry',
-                    category: prod.category || 'General'
-                });
-            }
-
-            const nameParts = customer.name.split(' ');
-            mockOrders.push({
-                id: orderId,
-                trackingCode: `HK-${orderId}-PAK`,
-                created_at: orderDate.toISOString(),
-                status: status,
-                details: {
-                    firstName: nameParts[0],
-                    lastName: nameParts[1] || 'Customer',
-                    phone: customer.phone,
-                    email: customer.email,
-                    address: `Street #${i + 1}, Block ${String.fromCharCode(65 + (i % 6))}`,
-                    city: customer.city,
-                    state: 'Pakistan',
-                    paymentMethod: (i % 3 === 0) ? 'bank' : 'cod',
-                    total: total,
-                    items: items,
-                    status: status
-                }
-            });
-        }
-
-        // Merge with existing orders
-        const existingIds = new Set(orders.map(o => o.id));
-        mockOrders.forEach(mo => {
-            if (!existingIds.has(mo.id)) orders.push(mo);
-        });
-
-        localStorage.setItem('hk_all_orders', JSON.stringify(orders));
-    }
+    return;
 }
 
 function initAnalytics() {
