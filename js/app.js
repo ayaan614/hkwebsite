@@ -2079,21 +2079,30 @@ function renderCheckoutPage() {
                                 <div class="payment-option" id="pay-bank">
                                     <input type="radio" name="payment-method" value="bank" id="radio-bank">
                                     <div class="payment-option-text">
-                                        <label for="radio-bank"><h5>🏦 Direct Bank Transfer / EasyPaisa / JazzCash (Manual)</h5></label>
-                                        <p>Send payment directly to our official Bank Alfalah account or EasyPaisa/JazzCash business account. Orders dispatched upon verification.</p>
+                                        <label for="radio-bank"><h5>🏦 Direct Bank Transfer / EasyPaisa (Manual)</h5></label>
+                                        <p>Send payment directly to our official Meezan Bank account or EasyPaisa account. Orders dispatched upon verification.</p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Bank & Wallet Details Box -->
                             <div id="bank-details-box" style="margin-top: 14px; padding: 16px; background-color: var(--color-bg-offset); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); font-size: 0.88rem; display: none;">
-                                <strong>HK Accessories Official Payment Accounts:</strong><br>
-                                📌 <strong>Bank Name:</strong> Bank Alfalah Ltd.<br>
-                                📌 <strong>Account Title:</strong> HK Accessories<br>
-                                📌 <strong>Account Number:</strong> 0123-456789-012<br>
-                                📌 <strong>IBAN:</strong> PK85ALFH0123456789012<br>
-                                📌 <strong>EasyPaisa / JazzCash Wallet:</strong> 0300-1234567<br>
-                                <em style="color: #64748B; margin-top: 6px; display: block;">Send your transaction screenshot to our WhatsApp (+92 317 4914140) after transferring for instant verification.</em>
+                                <strong style="font-size: 0.95rem; color: var(--color-primary-dark); display: block; margin-bottom: 8px;">HK Accessories Official Payment Accounts:</strong>
+                                
+                                <div style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed var(--color-border);">
+                                    <strong style="color: var(--color-primary);">🏦 Meezan Bank:</strong><br>
+                                    📌 <strong>Account Title:</strong> Hina kaleem dogar<br>
+                                    📌 <strong>Account Number:</strong> 02480106933374<br>
+                                    📌 <strong>IBAN:</strong> PK22MEZN0002480106933374
+                                </div>
+                                
+                                <div>
+                                    <strong style="color: var(--color-primary);">📱 EasyPaisa:</strong><br>
+                                    📌 <strong>Account Title:</strong> Hina kaleem<br>
+                                    📌 <strong>EasyPaisa Number:</strong> 03364422188
+                                </div>
+                                
+                                <em style="color: #64748B; margin-top: 10px; display: block;">Send your transaction screenshot to our WhatsApp (+92 317 4914140) after transferring for instant verification.</em>
                             </div>
                         </div>
 
