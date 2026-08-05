@@ -1259,7 +1259,6 @@ function renderProductCards(productsList) {
                     
                     <div class="product-badges">
                         ${hasDiscount ? `<span class="badge-sale">-${discountPct}% OFF</span>` : ''}
-                        ${!isProductInStock(p) ? `<span class="badge-outofstock">Sold Out</span>` : ''}
                     </div>
 
                     <button class="wishlist-btn-overlay ${isWish ? 'in-wishlist' : ''} btn-toggle-wishlist" data-id="${p.id}">
@@ -1293,8 +1292,8 @@ function renderProductCards(productsList) {
                                         data-attr-name="${escapeHtml(s.attrName)}" 
                                         data-raw-option="${escapeHtml(s.rawOption)}"
                                         data-price="${s.price}"
-                                        title="${escapeHtml(s.attrName)}: ${escapeHtml(s.rawOption)}${!s.isInstock ? ' (Out of Stock)' : ''}"
-                                        ${!s.isInstock ? 'disabled' : ''}>
+                                        title="${escapeHtml(s.attrName)}: ${escapeHtml(s.rawOption)}${!s.isInstock ? ' (Unavailable)' : ''}"
+                                        ${!s.isInstock ? 'disabled aria-disabled="true"' : ''}>
                                         ${escapeHtml(s.cleanLabel)}
                                     </button>
                                 `).join('')}
@@ -1305,7 +1304,7 @@ function renderProductCards(productsList) {
 
                     <div class="card-action-row">
                         <button type="button" class="btn btn-gold btn-full btn-card-add-to-cart" data-id="${p.id}" ${!isProductInStock(p) ? 'disabled' : ''}>
-                            <i class="fa-solid fa-bag-shopping"></i> ${isProductInStock(p) ? 'Add to Bag' : 'Sold Out'}
+                            <i class="fa-solid fa-bag-shopping"></i> Add to Bag
                         </button>
                     </div>
                 </div>
@@ -1362,7 +1361,7 @@ function bindProductCardEvents() {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (btn.disabled || btn.classList.contains('disabled')) return;
+            if (btn.disabled || btn.classList.contains('disabled') || btn.getAttribute('aria-disabled') === 'true') return;
 
             const card = btn.closest('.product-card');
             if (!card) return;
@@ -1514,9 +1513,6 @@ async function renderProductDetailPage(id) {
                                 <span class="rating-count">(${product.reviews ? product.reviews.length : 1} Customer Reviews)</span>
                             </div>
                             <span class="detail-sku">SKU: ${product.sku}</span>
-                            <span class="stock-status-badge ${isProductInStock(product) ? 'stock-instock' : 'stock-outofstock'}">
-                                ${isProductInStock(product) ? 'In Stock' : 'Sold Out'}
-                            </span>
                         </div>
 
                         <div class="detail-pricing">
@@ -1558,8 +1554,9 @@ async function renderProductDetailPage(id) {
                                         let rawLabel = sizeAttr ? (sizeAttr.option || sizeAttr.value || 'Size') : 'Size';
                                         // Map standalone codes like 'S', 'M', 'L', 'XL' to full names while preserving existing full labels like '6 (Small)' or 'Medium'
                                         const sizeLabel = sizeAbbrevMap[rawLabel.toUpperCase()] || rawLabel;
-                                        const disabled = v.stock_status !== 'instock' ? 'disabled' : '';
-                                        return `<button type="button" class="size-option-btn btn btn-outline-dark" data-variation-id="${v.id}">${escapeHtml(sizeLabel)}</button>`;
+                                        const isUnavail = v.stock_status !== 'instock' || v.is_in_stock === false;
+                                        const disabledAttr = isUnavail ? 'disabled aria-disabled="true"' : '';
+                                        return `<button type="button" class="size-option-btn btn btn-outline-dark ${isUnavail ? 'disabled' : ''}" data-variation-id="${v.id}" ${disabledAttr}>${escapeHtml(sizeLabel)}</button>`;
                                     }).join(' ');
                                 })()}
                             </div>

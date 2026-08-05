@@ -1261,14 +1261,37 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card-size-btn:disabled,
-.card-size-btn.disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    background-color: #F1F5F9;
-    color: #94A3B8;
-    border-color: #CBD5E1;
-    text-decoration: line-through;
-    pointer-events: none;
+.card-size-btn.disabled,
+.size-option-btn:disabled,
+.size-option-btn.disabled {
+    position: relative !important;
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+    background-color: #F8FAFC !important;
+    color: #64748B !important;
+    border-color: #CBD5E1 !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+
+/* Diagonal Cross Line passing through the size chip */
+.card-size-btn:disabled::after,
+.card-size-btn.disabled::after,
+.size-option-btn:disabled::after,
+.size-option-btn.disabled::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: -10% !important;
+    width: 120% !important;
+    height: 1.5px !important;
+    background-color: #EF4444 !important;
+    transform: translateY(-50%) rotate(-35deg) !important;
+    pointer-events: none !important;
+    border-radius: 1px !important;
+    display: block !important;
 }
 
 .card-size-warning {
