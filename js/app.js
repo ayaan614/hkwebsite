@@ -1154,6 +1154,93 @@ function renderWishlistPage() {
     });
 }
 
+// --- Helper to extract product size options from variations or attributes ---
+function getProductSizes(p) {
+    if (!p) return [];
+
+    // 1. Extract from variations array if present
+    if (Array.isArray(p.variations) && p.variations.length > 0) {
+        const sizes = [];
+        for (const v of p.variations) {
+            if (!v || typeof v !== 'object') continue;
+            const vAttrs = Array.isArray(v.attributes) ? v.attributes : [];
+            let sizeAttr = vAttrs.find(a => a && a.name && /size|ring|dress|bangle/i.test(a.name));
+            if (!sizeAttr && vAttrs.length > 0) {
+                sizeAttr = vAttrs[0];
+            }
+
+            if (sizeAttr) {
+                const rawOption = sizeAttr.option || sizeAttr.value || '';
+                const attrName = sizeAttr.name || 'Size';
+                
+                const stockSt = v.stock_status || 'instock';
+                let isInstock = stockSt === 'instock';
+                if (v.is_in_stock === false) isInstock = false;
+                if (v.stock_quantity !== null && v.stock_quantity !== undefined && v.stock_quantity <= 0) {
+                    isInstock = false;
+                }
+
+                sizes.push({
+                    variationId: v.id,
+                    attrName: attrName,
+                    rawOption: rawOption,
+                    cleanLabel: formatSizeLabel(rawOption),
+                    isInstock: isInstock,
+                    price: v.price !== undefined ? v.price : p.price,
+                    regularPrice: v.regular_price !== undefined ? v.regular_price : p.regular_price
+                });
+            }
+        }
+        
+        const hasSizeKeyword = sizes.some(s => /size|ring|dress|bangle/i.test(s.attrName));
+        if (hasSizeKeyword || (sizes.length > 0 && sizes.length <= 15)) {
+            return sizes;
+        }
+    }
+
+    // 2. Fallback to top-level attributes object if variations not detailed
+    if (p.attributes && typeof p.attributes === 'object' && !Array.isArray(p.attributes)) {
+        for (const [k, v] of Object.entries(p.attributes)) {
+            if (/size|ring|dress|bangle/i.test(k) && v) {
+                const opts = String(v).split(',').map(o => o.trim()).filter(Boolean);
+                return opts.map(opt => ({
+                    variationId: null,
+                    attrName: k,
+                    rawOption: opt,
+                    cleanLabel: formatSizeLabel(opt),
+                    isInstock: isProductInStock(p),
+                    price: p.price,
+                    regularPrice: p.regular_price
+                }));
+            }
+        }
+    }
+
+    return [];
+}
+
+function formatSizeLabel(rawOption) {
+    if (!rawOption) return '';
+    const str = String(rawOption).trim();
+    // Match pattern like "7 (Normal)", "6 (Small)", "5 (X Small)", "8 (Medium)", "9 (Large)"
+    const m = str.match(/^(\d+)\s*\([^)]*\)$/);
+    if (m) return m[1];
+
+    const abbrevMap = {
+        'small': 'S',
+        'medium': 'M',
+        'large': 'L',
+        'extra large': 'XL',
+        '2x large': '2XL',
+        '3x large': '3XL'
+    };
+    if (abbrevMap[str.toLowerCase()]) {
+        return abbrevMap[str.toLowerCase()];
+    }
+
+    return str;
+}
+
 // --- Helper to build Product cards ---
 function renderProductCards(productsList) {
     return productsList.map((p, idx) => {
@@ -1161,11 +1248,14 @@ function renderProductCards(productsList) {
         const isWish = isInWishlist(p.id);
         const hasDiscount = p.on_sale && p.regular_price > p.price;
         const discountPct = hasDiscount ? Math.round(((p.regular_price - p.price) / p.regular_price) * 100) : 0;
-        
+        const sizes = getProductSizes(p);
+        const hasSizeOptions = sizes && sizes.length > 0;
+        const mainImage = p.images && p.images.length > 0 ? p.images[0] : (p.image || '');
+
         return `
             <div class="product-card" data-id="${p.id}">
                 <div class="product-image-wrapper">
-                    ${getOptimizedImgTag({ src: p.images[0], alt: p.title, width: 300, height: 300, isEager, aspectRatio: "1/1" })}
+                    ${getOptimizedImgTag({ src: mainImage, alt: p.title, width: 300, height: 300, isEager, aspectRatio: "1/1" })}
                     
                     <div class="product-badges">
                         ${hasDiscount ? `<span class="badge-sale">-${discountPct}% OFF</span>` : ''}
@@ -1181,15 +1271,42 @@ function renderProductCards(productsList) {
                     </div>
                 </div>
                 <div class="product-details">
-                    <div class="product-cat">${escapeHtml(p.category)}</div>
+                    <div class="product-cat">${escapeHtml(p.category || p.department || '')}</div>
                     <a href="#/product/${p.id}" class="product-title">${escapeHtml(p.title)}</a>
                     <div class="product-rating">
-                        ${renderStars(p.average_rating)}
+                        ${renderStars(p.average_rating || 5)}
                         <span class="rating-count">(${p.reviews ? p.reviews.length : 1})</span>
                     </div>
                     <div class="product-pricing">
                         <span class="current-price">PKR ${p.price?.toLocaleString()}</span>
                         ${hasDiscount ? `<span class="regular-price">PKR ${p.regular_price?.toLocaleString()}</span>` : ''}
+                    </div>
+
+                    ${hasSizeOptions ? `
+                        <div class="card-size-section">
+                            <div class="card-size-label">Select Size:</div>
+                            <div class="card-size-options">
+                                ${sizes.map(s => `
+                                    <button type="button" 
+                                        class="card-size-btn ${!s.isInstock ? 'disabled' : ''}" 
+                                        data-variation-id="${s.variationId ?? ''}" 
+                                        data-attr-name="${escapeHtml(s.attrName)}" 
+                                        data-raw-option="${escapeHtml(s.rawOption)}"
+                                        data-price="${s.price}"
+                                        title="${escapeHtml(s.attrName)}: ${escapeHtml(s.rawOption)}${!s.isInstock ? ' (Out of Stock)' : ''}"
+                                        ${!s.isInstock ? 'disabled' : ''}>
+                                        ${escapeHtml(s.cleanLabel)}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <div class="card-size-warning" style="display:none;">Please select a size</div>
+                        </div>
+                    ` : ''}
+
+                    <div class="card-action-row">
+                        <button type="button" class="btn btn-gold btn-full btn-card-add-to-cart" data-id="${p.id}" ${!isProductInStock(p) ? 'disabled' : ''}>
+                            <i class="fa-solid fa-bag-shopping"></i> ${isProductInStock(p) ? 'Add to Bag' : 'Sold Out'}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1211,7 +1328,7 @@ function renderStars(rating) {
 }
 
 function bindProductCardEvents() {
-    // Wishlist Toggle Buttons
+    // 1. Wishlist Toggle Buttons
     const wishBtns = document.querySelectorAll('.btn-toggle-wishlist');
     wishBtns.forEach(btn => {
         btn.addEventListener('click', async (e) => {
@@ -1221,7 +1338,6 @@ function bindProductCardEvents() {
             const product = await getProductById(id);
             if (product) {
                 toggleWishlist(product);
-                // Update specific icon style in card
                 const isWishNow = isInWishlist(id);
                 btn.className = `wishlist-btn-overlay ${isWishNow ? 'in-wishlist' : ''} btn-toggle-wishlist`;
                 btn.querySelector('i').className = `${isWishNow ? 'fa-solid' : 'fa-regular'} fa-heart`;
@@ -1229,7 +1345,7 @@ function bindProductCardEvents() {
         });
     });
 
-    // Quick View click handles or standard title clicks redirect
+    // 2. Quick View click handles or standard title clicks redirect
     const quickBtns = document.querySelectorAll('.btn-quick-view');
     quickBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -1237,6 +1353,107 @@ function bindProductCardEvents() {
             e.stopPropagation();
             const id = btn.dataset.id;
             window.location.hash = `#/product/${id}`;
+        });
+    });
+
+    // 3. Card Size Pill Selection
+    const cardSizeBtns = document.querySelectorAll('.card-size-btn');
+    cardSizeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (btn.disabled || btn.classList.contains('disabled')) return;
+
+            const card = btn.closest('.product-card');
+            if (!card) return;
+
+            // Remove active state from sibling buttons in this card
+            card.querySelectorAll('.card-size-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Store selection on card dataset
+            card.dataset.selectedVarId = btn.dataset.variationId || '';
+            card.dataset.selectedAttrName = btn.dataset.attrName || '';
+            card.dataset.selectedRawOption = btn.dataset.rawOption || '';
+
+            // Hide warning if visible
+            const warningEl = card.querySelector('.card-size-warning');
+            if (warningEl) warningEl.style.display = 'none';
+
+            // Dynamically update card price if variation price exists
+            const varPrice = parseFloat(btn.dataset.price);
+            if (!isNaN(varPrice) && varPrice > 0) {
+                const currentPriceEl = card.querySelector('.current-price');
+                if (currentPriceEl) {
+                    currentPriceEl.textContent = `PKR ${varPrice.toLocaleString()}`;
+                }
+            }
+        });
+    });
+
+    // 4. Card Add to Bag / Add to Cart Button Click
+    const cardAddBtns = document.querySelectorAll('.btn-card-add-to-cart');
+    cardAddBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (btn.disabled) return;
+
+            const card = btn.closest('.product-card');
+            if (!card) return;
+
+            const productId = parseInt(btn.dataset.id, 10);
+            const product = await getProductById(productId);
+            if (!product) return;
+
+            const sizeSection = card.querySelector('.card-size-section');
+            const hasSizes = !!sizeSection;
+
+            if (hasSizes) {
+                const selectedRawOption = card.dataset.selectedRawOption;
+                if (!selectedRawOption) {
+                    // Show clear error message: "Please select a size."
+                    const warningEl = card.querySelector('.card-size-warning');
+                    if (warningEl) warningEl.style.display = 'block';
+
+                    // Shake size pills options container for visual feedback
+                    const optionsBox = card.querySelector('.card-size-options');
+                    if (optionsBox) {
+                        optionsBox.classList.remove('shake-warning');
+                        void optionsBox.offsetWidth; // Trigger reflow
+                        optionsBox.classList.add('shake-warning');
+                    }
+                    return;
+                }
+            }
+
+            // Build cart item parameters
+            const attrName = card.dataset.selectedAttrName || 'Size';
+            const rawOption = card.dataset.selectedRawOption || '';
+            const selectedAttributes = rawOption ? { [attrName]: rawOption } : {};
+            const variationId = card.dataset.selectedVarId ? parseInt(card.dataset.selectedVarId, 10) : null;
+            const price = card.dataset.selectedPrice ? parseFloat(card.dataset.selectedPrice) : product.price;
+
+            const cartItem = {
+                ...product,
+                price: price,
+                variationId: variationId
+            };
+
+            addToCart(cartItem, 1, selectedAttributes);
+
+            // Visual button confirmation
+            const origHtml = btn.innerHTML;
+            btn.classList.add('btn-added-success');
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Added!`;
+
+            setTimeout(() => {
+                btn.classList.remove('btn-added-success');
+                btn.innerHTML = origHtml;
+            }, 1200);
+
+            // Open cart drawer
+            openCartDrawer();
         });
     });
 }

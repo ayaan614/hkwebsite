@@ -1201,6 +1201,125 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: line-through;
 }
 
+/* Card Size Selector Styling */
+.card-size-section {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(201, 168, 76, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card-size-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.card-size-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.card-size-btn {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    color: var(--color-primary-dark);
+    background-color: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    user-select: none;
+}
+
+.card-size-btn:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    color: var(--color-primary);
+    background-color: rgba(201, 168, 76, 0.1);
+}
+
+.card-size-btn.active {
+    background-color: var(--color-primary-dark) !important;
+    color: var(--color-accent) !important;
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 2px 6px rgba(5, 35, 25, 0.25);
+    font-weight: 700;
+}
+
+.card-size-btn:disabled,
+.card-size-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: #F1F5F9;
+    color: #94A3B8;
+    border-color: #CBD5E1;
+    text-decoration: line-through;
+    pointer-events: none;
+}
+
+.card-size-warning {
+    color: #EF4444;
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-top: 3px;
+    animation: fadeIn 0.2s ease;
+}
+
+.card-size-options.shake-warning {
+    animation: cardSizeShake 0.4s ease;
+}
+
+@keyframes cardSizeShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
+}
+
+/* Card Action Button */
+.card-action-row {
+    margin-top: 12px;
+}
+
+.btn-card-add-to-cart {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: var(--border-radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-card-add-to-cart:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-card-add-to-cart.btn-added-success {
+    background-color: #10B981 !important;
+    color: #FFFFFF !important;
+    border-color: #10B981 !important;
+}
+
 /* --- HOMEPAGE CAMPAIGN BANNER --- */
 .campaign-sec {
     padding: 100px 0;
