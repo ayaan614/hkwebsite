@@ -10,7 +10,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=37">
+    <link rel="stylesheet" href="style.css?v=100">
+    <!-- Direct Theme Override to prevent CDN caching of green overlay -->
+    <style id="theme-override-force">
+        .dept-overlay {
+            background: linear-gradient(to top, rgba(24, 24, 24, 0.95) 20%, rgba(24, 24, 24, 0.45)) !important;
+        }
+        .quick-view-overlay, .btn-quick-view {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -166,6 +175,6 @@
         </div>
     </footer>
 
-    <script type="module" src="js/app.js?v=37"></script>
+    <script type="module" src="js/app.js?v=100"></script>
 </body>
 </html>

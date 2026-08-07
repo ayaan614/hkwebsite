@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Base Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=37">
+    <link rel="stylesheet" href="style.css?v=100">
     <!-- Chart.js for Analytics Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -738,6 +738,15 @@
             line-height: 1.45;
         }
     </style>
+    <!-- Direct Theme Override to prevent CDN caching of green overlay -->
+    <style id="theme-override-force">
+        .dept-overlay {
+            background: linear-gradient(to top, rgba(24, 24, 24, 0.95) 20%, rgba(24, 24, 24, 0.45)) !important;
+        }
+        .quick-view-overlay, .btn-quick-view {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -1455,6 +1464,6 @@
     </div>
 
     <!-- CMS Controller Script -->
-    <script type="module" src="js/admin.js?v=37"></script>
+    <script type="module" src="js/admin.js?v=100"></script>
 </body>
 </html>

@@ -18,7 +18,16 @@
     <link rel="preload" as="image" href="ring_img.webp" type="image/webp">
     
     <!-- Core CSS stylesheet -->
-    <link rel="stylesheet" href="style.css?v=37">
+    <link rel="stylesheet" href="style.css?v=100">
+    <!-- Direct Theme Override to prevent CDN caching of green overlay -->
+    <style id="theme-override-force">
+        .dept-overlay {
+            background: linear-gradient(to top, rgba(24, 24, 24, 0.95) 20%, rgba(24, 24, 24, 0.45)) !important;
+        }
+        .quick-view-overlay, .btn-quick-view {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -373,6 +382,6 @@
     </div>
 
     <!-- App main script controller (loaded as ES Module) -->
-    <script type="module" src="js/app.js?v=37"></script>
+    <script type="module" src="js/app.js?v=100"></script>
 </body>
 </html>
