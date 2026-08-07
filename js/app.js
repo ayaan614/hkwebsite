@@ -581,7 +581,7 @@ async function renderHomePage() {
                     <div class="departments-grid">
                         <!-- Diecast Card -->
                         <div class="dept-card">
-                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908", alt: "Diecast Collectibles", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=600&q=80", alt: "Diecast Collectibles", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Diecast Department</h3>
                                 <p>Premium heavy alloy model cars, motorbikes and collectibles.</p>
@@ -590,7 +590,7 @@ async function renderHomePage() {
                         </div>
                         <!-- Toys Card -->
                         <div class="dept-card">
-                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338", alt: "Premium Toys", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=600&q=80", alt: "Premium Toys", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Toys & Games</h3>
                                 <p>Action figures, educational puzzle blocks, and remote control cars.</p>
@@ -599,7 +599,7 @@ async function renderHomePage() {
                         </div>
                         <!-- Clothing Card -->
                         <div class="dept-card">
-                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1605100804763-247f67b3557e", alt: "Clothing Apparel", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
+                            ${getOptimizedImgTag({ src: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80", alt: "Clothing Apparel", className: "dept-card-bg", width: 600, height: 400, aspectRatio: "3/2" })}
                             <div class="dept-overlay">
                                 <h3>Clothing Department</h3>
                                 <p>Relaxed-fit cotton tees, fleece hoodies, and trendy apparel.</p>

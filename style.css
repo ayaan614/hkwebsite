@@ -39,9 +39,9 @@
     --border-radius-md: 8px;
     --border-radius-lg: 16px;
 
-    --shadow-sm: 0 2px 8px rgba(12, 62, 45, 0.05);
-    --shadow-md: 0 8px 24px rgba(12, 62, 45, 0.08);
-    --shadow-lg: 0 16px 48px rgba(12, 62, 45, 0.12);
+    --shadow-sm: 0 2px 8px rgba(24, 24, 24, 0.06);
+    --shadow-md: 0 8px 24px rgba(24, 24, 24, 0.10);
+    --shadow-lg: 0 16px 48px rgba(24, 24, 24, 0.15);
 
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -1232,7 +1232,7 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--color-primary-dark) !important;
     color: var(--color-accent) !important;
     border-color: var(--color-accent) !important;
-    box-shadow: 0 2px 6px rgba(5, 35, 25, 0.25);
+    box-shadow: 0 2px 6px rgba(24, 24, 24, 0.25);
     font-weight: 700;
 }
 
@@ -1402,7 +1402,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to top, rgba(12, 62, 45, 0.95) 15%, rgba(12, 62, 45, 0.3));
+    background: linear-gradient(to top, rgba(24, 24, 24, 0.92) 20%, rgba(24, 24, 24, 0.45));
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -1565,7 +1565,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(12, 62, 45, 0.7);
+    background-color: rgba(24, 24, 24, 0.75);
     color: #F7F3ED;
     font-size: 1.5rem;
     display: flex;
@@ -1662,7 +1662,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to right, rgba(5, 35, 25, 0.9), rgba(5, 35, 25, 0.4));
+    background: linear-gradient(to right, rgba(24, 24, 24, 0.92), rgba(24, 24, 24, 0.55));
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -2401,7 +2401,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .payment-option.active {
     border-color: var(--color-primary);
-    background-color: rgba(12, 62, 45, 0.03);
+    background-color: rgba(24, 24, 24, 0.03);
 }
 
 .payment-option input[type="radio"] {
@@ -2599,7 +2599,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(5, 35, 25, 0.4);
+    background-color: rgba(24, 24, 24, 0.65);
     opacity: 0;
     visibility: hidden;
     transition: var(--transition-normal);
@@ -2754,7 +2754,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(5, 35, 25, 0.4);
+    background-color: rgba(24, 24, 24, 0.65);
     opacity: 0;
     visibility: hidden;
     transition: var(--transition-normal);
@@ -2886,7 +2886,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(5, 35, 25, 0.4);
+    background-color: rgba(24, 24, 24, 0.65);
     opacity: 0;
     visibility: hidden;
     transition: var(--transition-normal);

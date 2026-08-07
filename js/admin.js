@@ -915,29 +915,34 @@ function openEditModal(id) {
     if (!item) return;
 
     currentEditId = id;
-    modalFormTitle.textContent = `Edit Product #${id}`;
+    if (modalFormTitle) modalFormTitle.textContent = `Edit Product #${id}`;
     
-    document.getElementById('p-id').value = item.id;
-    document.getElementById('p-title').value = item.title || '';
-    document.getElementById('p-department').value = item.department || 'jewelry';
-    document.getElementById('p-category').value = item.category || '';
-    document.getElementById('p-price').value = item.price || 0;
-    document.getElementById('p-regular-price').value = item.regular_price || item.price || 0;
-    document.getElementById('p-stock-status').value = item.stock_status || 'instock';
-    document.getElementById('p-sku').value = item.sku || '';
+    const elId = document.getElementById('p-id'); if (elId) elId.value = item.id;
+    const elTitle = document.getElementById('p-title'); if (elTitle) elTitle.value = item.title || '';
+    const elDept = document.getElementById('p-department'); if (elDept) elDept.value = item.department || 'jewelry';
+    const elCat = document.getElementById('p-category'); if (elCat) elCat.value = item.category || '';
+    const elPrice = document.getElementById('p-price'); if (elPrice) elPrice.value = item.price || 0;
+    const elRegPrice = document.getElementById('p-regular-price'); if (elRegPrice) elRegPrice.value = item.regular_price || item.price || 0;
+    const elStockSt = document.getElementById('p-stock-status'); if (elStockSt) elStockSt.value = item.stock_status || 'instock';
+    const elSku = document.getElementById('p-sku'); if (elSku) elSku.value = item.sku || '';
     const stockQtyVal = (item.stock_quantity !== undefined && item.stock_quantity !== null) ? item.stock_quantity : '';
-    document.getElementById('p-stock-quantity').value = stockQtyVal;
-    document.getElementById('p-image').value = (item.images && item.images.length > 0) ? item.images[0] : '';
-    document.getElementById('p-description').value = item.description || item.short_description || '';
-    document.getElementById('p-onsale').checked = Boolean(item.on_sale);
+    const elStockQty = document.getElementById('p-stock-quantity'); if (elStockQty) elStockQty.value = stockQtyVal;
+    
+    const elImgInput = document.getElementById('p-image-url-input') || document.getElementById('p-image');
+    if (elImgInput) elImgInput.value = (item.images && item.images.length > 0) ? item.images[0] : '';
+    
+    const elDesc = document.getElementById('p-description'); if (elDesc) elDesc.value = item.description || item.short_description || '';
+    const elOnSale = document.getElementById('p-onsale'); if (elOnSale) elOnSale.checked = Boolean(item.on_sale);
 
     // Load product gallery images
     const existingImgs = (item.images && Array.isArray(item.images) && item.images.length > 0) 
         ? [...item.images] 
         : [];
-    resetImageUploader(existingImgs);
+    if (typeof resetImageUploader === 'function') {
+        resetImageUploader(existingImgs);
+    }
 
-    productModal.classList.add('active');
+    if (productModal) productModal.classList.add('active');
 }
 
 function closeProductModal() {
