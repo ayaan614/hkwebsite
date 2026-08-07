@@ -1097,41 +1097,17 @@ h1, h2, h3, h4, h5, h6 {
     color: #FF4757;
 }
 
-/* Quick Shop/View Button on Hover */
-.quick-view-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+.product-image-link {
+    display: block;
     width: 100%;
-    padding: 12px;
-    background: linear-gradient(to top, rgba(5, 35, 25, 0.8) 20%, rgba(5, 35, 25, 0));
-    transform: translateY(100%);
-    transition: var(--transition-normal);
-    display: flex;
-    justify-content: center;
-    z-index: 5;
+    height: 100%;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.product-card:hover .quick-view-overlay {
-    transform: translateY(0);
-}
-
+.quick-view-overlay,
 .btn-quick-view {
-    background-color: var(--color-accent);
-    color: var(--color-primary-dark);
-    padding: 8px 16px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-radius: var(--border-radius-sm);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition-fast);
-}
-
-.btn-quick-view:hover {
-    background-color: #F7F3ED;
-    color: var(--color-primary-dark);
+    display: none !important;
 }
 
 /* Card details */

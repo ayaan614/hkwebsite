@@ -1255,7 +1255,9 @@ function renderProductCards(productsList) {
         return `
             <div class="product-card" data-id="${p.id}">
                 <div class="product-image-wrapper">
-                    ${getOptimizedImgTag({ src: mainImage, alt: p.title, width: 300, height: 300, isEager, aspectRatio: "1/1" })}
+                    <a href="#/product/${p.id}" class="product-image-link" aria-label="${escapeHtml(p.title)}">
+                        ${getOptimizedImgTag({ src: mainImage, alt: p.title, width: 300, height: 300, isEager, aspectRatio: "1/1" })}
+                    </a>
                     
                     <div class="product-badges">
                         ${hasDiscount ? `<span class="badge-sale">-${discountPct}% OFF</span>` : ''}
@@ -1264,10 +1266,6 @@ function renderProductCards(productsList) {
                     <button class="wishlist-btn-overlay ${isWish ? 'in-wishlist' : ''} btn-toggle-wishlist" data-id="${p.id}">
                         <i class="${isWish ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
                     </button>
-
-                    <div class="quick-view-overlay">
-                        <button class="btn-quick-view" data-id="${p.id}">Quick Details</button>
-                    </div>
                 </div>
                 <div class="product-details">
                     <div class="product-cat">${escapeHtml(p.category || p.department || '')}</div>
@@ -1341,17 +1339,6 @@ function bindProductCardEvents() {
                 btn.className = `wishlist-btn-overlay ${isWishNow ? 'in-wishlist' : ''} btn-toggle-wishlist`;
                 btn.querySelector('i').className = `${isWishNow ? 'fa-solid' : 'fa-regular'} fa-heart`;
             }
-        });
-    });
-
-    // 2. Quick View click handles or standard title clicks redirect
-    const quickBtns = document.querySelectorAll('.btn-quick-view');
-    quickBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const id = btn.dataset.id;
-            window.location.hash = `#/product/${id}`;
         });
     });
 
