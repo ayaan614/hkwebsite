@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://basketoflove.vercel.app/sitemap.xml
