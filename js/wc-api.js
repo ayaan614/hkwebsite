@@ -255,7 +255,7 @@ export async function getSearchSuggestions(query, department = '') {
  */
 export function getWhatsAppOrderUrl(orderRecord, recipientPhone = null) {
     const details = orderRecord.details || orderRecord;
-    const phone = (recipientPhone || localStorage.getItem('hk_admin_wa_phone') || '923174914140').replace(/[^0-9]/g, '');
+    const phone = (recipientPhone || localStorage.getItem('hk_admin_wa_phone') || '923364422188').replace(/[^0-9]/g, '');
 
     const items = details.items || [];
     const itemsText = items.map((it, idx) => 

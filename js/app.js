@@ -2490,31 +2490,24 @@ function renderContactPage() {
                 <!-- Info Col -->
                 <div class="contact-info-col">
                     <div class="contact-info-item">
-                        <i class="fa-solid fa-location-dot"></i>
-                        <div>
-                            <h4>Our Address</h4>
-                            <p>HK Accessories Warehouse Hub,<br>Gulberg III, Lahore, Pakistan.</p>
-                        </div>
-                    </div>
-                    <div class="contact-info-item">
                         <i class="fa-solid fa-phone"></i>
                         <div>
                             <h4>Phone / Call Center</h4>
-                            <p>+92 42 111-HK-ACCS (111-452-227)</p>
+                            <p>+92 336 4422188</p>
                         </div>
                     </div>
                     <div class="contact-info-item">
                         <i class="fa-brands fa-whatsapp"></i>
                         <div>
                             <h4>WhatsApp Chat</h4>
-                            <p><a href="https://wa.me/923001234567" target="_blank" style="color: var(--color-success); font-weight: 600;">+92 300 1234567</a></p>
+                            <p><a href="https://wa.me/923364422188" target="_blank" style="color: var(--color-success); font-weight: 600;">+92 336 4422188</a></p>
                         </div>
                     </div>
                     <div class="contact-info-item">
                         <i class="fa-solid fa-envelope"></i>
                         <div>
                             <h4>Email Support</h4>
-                            <p>support@hk-accessories.com</p>
+                            <p>HK_accessories@ymal.com</p>
                         </div>
                     </div>
                 </div>

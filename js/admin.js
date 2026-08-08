@@ -746,7 +746,7 @@ function renderOrdersTab() {
     const waPhoneInput = document.getElementById('admin-wa-phone');
     const saveWaPhoneBtn = document.getElementById('btn-save-wa-phone');
     if (waPhoneInput) {
-        waPhoneInput.value = localStorage.getItem('hk_admin_wa_phone') || '923174914140';
+        waPhoneInput.value = localStorage.getItem('hk_admin_wa_phone') || '923364422188';
     }
     if (saveWaPhoneBtn && !saveWaPhoneBtn.dataset.bound) {
         saveWaPhoneBtn.dataset.bound = 'true';
